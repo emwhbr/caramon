@@ -1,0 +1,39 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# EMWHBR 2015-12-14
+# Playing with output from this script
+exec 2> /tmp/rc.local.log  # send stderr from rc.local to a log file
+exec 1>&2                  # send stdout to the same log file
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+
+# EMWHBR 2015-12-12
+# Register I2C RTC DS3231 and update system time from the device
+echo ds3231 0x68 >/sys/bus/i2c/devices/i2c-1/new_device
+sleep 0.5     # Allow registration to complete
+hwclock -s    # Update system time...
+sleep 1.0     # ... wait a bit...
+hwclock -s    # ....and do it again
+
+hwclock -r && date  # Check result in the log file
+
+# EMWHBR 2016-01-01
+# Start CMON
+/caramon/cmon_util.sh start
+
+exit 0
