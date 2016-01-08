@@ -1,0 +1,42 @@
+This guide describes how to cross-compile (on a Linux host) an
+executable test application that uses rcswitch-pi.
+
+rcswitch-pi controls rc remote controlled power sockets with the Raspberry Pi.
+The software requires library WiringPi. For further information, see
+https://github.com/r10r/rcswitch-pi.
+
+Procedure:
+----------
+1. Download rcswitch-pi.
+2. Apply cross-compile fixes.
+3. Build test application.
+
+-----------------------------------------
+-- 1. Download WiringPi
+-----------------------------------------
+Download rcswitch-pi using GIT:
+git clone https://github.com/r10r/rcswitch-pi.git
+
+-----------------------------------------
+-- 2. Apply cross-compile fixes
+-----------------------------------------
+Change directory:
+cd rcswitch-pi
+
+Copy makefile for test application:
+cp ../Makefile_tx433 .
+
+This makes it possible to cross-compile the test application.
+The file includes some hard coded values for toolchain path,
+prefix and where to find WiringPi library on host.
+
+-----------------------------------------
+-- 3. Build test application
+-----------------------------------------
+Copy test application source code:
+cp ../tx433.cpp .
+
+Build test application using cross-compiler from step(2) above:
+make -f /Makefile_tx433 all
+
+This will generate the test application: tx433

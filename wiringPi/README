@@ -1,0 +1,60 @@
+This guide describes how to cross-compile a static version
+of WiringPi on a Linux host.
+
+WiringPi is a GPIO interface library for the Raspberry Pi.
+For further information, see www.wiringpi.com.
+
+Procedure:
+----------
+1. Download WiringPi.
+2. Apply cross-compile fixes.
+3. Build static library.
+4. Install static library.
+
+-----------------------------------------
+-- 1. Download WiringPi
+-----------------------------------------
+Obtain WiringPi by using (A) or (B) below.
+
+(A) Download WiringPi using GIT:
+git clone git://git.drogon.net/wiringPi
+
+(B) Download a snaphot from:
+https://git.drogon.net/?p=wiringPi;a=summary
+
+This guide was written by using library version 2.31.
+The snapshot label: wiringPi-78b5c32
+
+-----------------------------------------
+-- 2. Apply cross-compile fixes
+-----------------------------------------
+Change directory to library:
+cd wiringPi-78b5c32/wiringPi/
+
+Copy makefile with cross-compile fixes:
+cp ../../Makefile_WiringPi_CrossCompile .
+
+This makefile includes changes (marked with EMWHBR) to make it possible
+to cross-compile the library. It includes some hard coded values for
+toolchain path, prefix and where to install library on host.
+
+-----------------------------------------
+-- 3. Build static library
+-----------------------------------------
+Build library using cross-compiler from step(2) above:
+make -f Makefile_WiringPi_CrossCompile static
+
+This will generate the static library: libwiringPi.a
+
+-----------------------------------------
+-- 4. Install static library
+-----------------------------------------
+Install static library, including header files:
+make -f Makefile_WiringPi_CrossCompile install-static
+
+The following will be installed:
+
+Header files: /proj/caramon/wiringPi/include
+Library:      /proj/caramon/wiringPi/lib
+
+Note! The installation path was set in step(2) above.

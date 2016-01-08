@@ -1,0 +1,13 @@
+TC_PREFIX=/opt/rpi/toolchains/x-tools/arm-unknown-linux-gnueabihf/bin/arm-unknown-linux-gnueabihf-
+RM=rm -rf
+CXX=$(TC_PREFIX)g++
+CXXFLAGS=-I/proj/caramon/wiringPi/include/
+LDFLAGS=-L/proj/caramon/wiringPi/lib/
+
+all: tx433
+
+tx433: RCSwitch.o tx433.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $+ -o $@ -lwiringPi -lpthread
+
+clean:
+	$(RM) *.o tx433 *~
