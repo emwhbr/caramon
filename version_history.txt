@@ -1,4 +1,16 @@
 ==================================================================
+23/1-2016 EMWHBR
+
+* R1A03
+
+* Added test applications:
+  - PID temperature control.
+  - PWM temperature control.
+
+* Updated documentation:
+  - Measurement data for various PID controllers.
+
+==================================================================
 8/1-2016 EMWHBR
 
 * R1A02

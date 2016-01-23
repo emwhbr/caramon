@@ -1,0 +1,2 @@
+Simple test application that performs PID temperature control.
+The radiator is controlled using a rc remote power socket.

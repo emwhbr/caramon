@@ -1,0 +1,463 @@
+root@raspberrypi:/caramon# ./pid_heater_rel.arm.4 10 13
+Cycles=0, Total time[min]=0.000000
+DUTY=100.000000, HI=600.000000, LO=0.000000, temp=12.348022
+Heater ON
+ON time[s]=599.988594
+OFF skipped
+Cycles=1, Total time[min]=10.000003
+DUTY=100.000000, HI=600.000000, LO=0.000000, temp=12.539368
+Heater ON
+ON time[s]=599.988674
+OFF skipped
+Cycles=2, Total time[min]=20.000002
+DUTY=96.943359, HI=581.660156, LO=18.339844, temp=12.730713
+Heater ON
+ON time[s]=581.648816
+Heater OFF
+OFF time[s]=18.339709
+Cycles=3, Total time[min]=30.000000
+DUTY=35.310059, HI=211.860352, LO=388.139648, temp=12.901917
+Heater ON
+ON time[s]=211.849130
+Heater OFF
+OFF time[s]=388.139489
+Cycles=4, Total time[min]=40.000000
+DUTY=31.684570, HI=190.107422, LO=409.892578, temp=12.911987
+Heater ON
+ON time[s]=190.096161
+Heater OFF
+OFF time[s]=409.892417
+Cycles=5, Total time[min]=49.999999
+DUTY=96.943359, HI=581.660156, LO=18.339844, temp=12.730713
+Heater ON
+ON time[s]=581.648836
+Heater OFF
+OFF time[s]=18.339714
+Cycles=6, Total time[min]=59.999997
+DUTY=100.000000, HI=600.000000, LO=0.000000, temp=12.670288
+Heater ON
+ON time[s]=599.988697
+OFF skipped
+Cycles=7, Total time[min]=69.999997
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119552
+Heater OFF
+OFF time[s]=235.868991
+Cycles=8, Total time[min]=79.999996
+DUTY=17.182617, HI=103.095703, LO=496.904297, temp=12.952271
+Heater ON
+ON time[s]=103.084441
+Heater OFF
+OFF time[s]=496.904122
+Cycles=9, Total time[min]=89.999995
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131272
+Heater OFF
+OFF time[s]=148.857288
+Cycles=10, Total time[min]=99.999994
+DUTY=100.000000, HI=600.000000, LO=0.000000, temp=12.720642
+Heater ON
+ON time[s]=599.988664
+OFF skipped
+Cycles=11, Total time[min]=109.999993
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131295
+Heater OFF
+OFF time[s]=148.857264
+Cycles=12, Total time[min]=119.999992
+DUTY=9.931641, HI=59.589844, LO=540.410156, temp=12.972412
+Heater ON
+ON time[s]=59.578598
+Heater OFF
+OFF time[s]=540.409979
+Cycles=13, Total time[min]=129.999991
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378394
+Heater OFF
+OFF time[s]=170.610213
+Cycles=14, Total time[min]=139.999990
+DUTY=89.692383, HI=538.154297, LO=61.845703, temp=12.750854
+Heater ON
+ON time[s]=538.142993
+Heater OFF
+OFF time[s]=61.845573
+Cycles=15, Total time[min]=149.999989
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131288
+Heater OFF
+OFF time[s]=148.857286
+Cycles=16, Total time[min]=159.999988
+DUTY=35.310059, HI=211.860352, LO=388.139648, temp=12.901917
+Heater ON
+ON time[s]=211.849124
+Heater OFF
+OFF time[s]=388.139486
+Cycles=17, Total time[min]=169.999987
+DUTY=49.812012, HI=298.872070, LO=301.127930, temp=12.861633
+Heater ON
+ON time[s]=298.860792
+Heater OFF
+OFF time[s]=301.127772
+Cycles=18, Total time[min]=179.999986
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390062
+Heater OFF
+OFF time[s]=83.598503
+Cycles=19, Total time[min]=189.999985
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390054
+Heater OFF
+OFF time[s]=83.598502
+Cycles=20, Total time[min]=199.999984
+DUTY=53.437500, HI=320.625000, LO=279.375000, temp=12.851562
+Heater ON
+ON time[s]=320.613728
+Heater OFF
+OFF time[s]=279.374842
+Cycles=21, Total time[min]=209.999983
+DUTY=31.684570, HI=190.107422, LO=409.892578, temp=12.911987
+Heater ON
+ON time[s]=190.096152
+Heater OFF
+OFF time[s]=409.892415
+Cycles=22, Total time[min]=219.999982
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131310
+Heater OFF
+OFF time[s]=148.857286
+Cycles=23, Total time[min]=229.999981
+DUTY=89.692383, HI=538.154297, LO=61.845703, temp=12.750854
+Heater ON
+ON time[s]=538.142983
+Heater OFF
+OFF time[s]=61.845570
+Cycles=24, Total time[min]=239.999980
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131273
+Heater OFF
+OFF time[s]=148.857283
+Cycles=25, Total time[min]=249.999979
+DUTY=35.310059, HI=211.860352, LO=388.139648, temp=12.901917
+Heater ON
+ON time[s]=211.849082
+Heater OFF
+OFF time[s]=388.139488
+Cycles=26, Total time[min]=259.999978
+DUTY=49.812012, HI=298.872070, LO=301.127930, temp=12.861633
+Heater ON
+ON time[s]=298.860801
+Heater OFF
+OFF time[s]=301.127774
+Cycles=27, Total time[min]=269.999977
+DUTY=78.815918, HI=472.895508, LO=127.104492, temp=12.781067
+Heater ON
+ON time[s]=472.884221
+Heater OFF
+OFF time[s]=127.104357
+Cycles=28, Total time[min]=279.999976
+DUTY=78.815918, HI=472.895508, LO=127.104492, temp=12.781067
+Heater ON
+ON time[s]=472.884221
+Heater OFF
+OFF time[s]=127.104348
+Cycles=29, Total time[min]=289.999975
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119564
+Heater OFF
+OFF time[s]=235.868996
+Cycles=30, Total time[min]=299.999974
+DUTY=35.310059, HI=211.860352, LO=388.139648, temp=12.901917
+Heater ON
+ON time[s]=211.849057
+Heater OFF
+OFF time[s]=388.139486
+Cycles=31, Total time[min]=309.999973
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378347
+Heater OFF
+OFF time[s]=170.610215
+Cycles=32, Total time[min]=319.999972
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390068
+Heater OFF
+OFF time[s]=83.598499
+Cycles=33, Total time[min]=329.999971
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378347
+Heater OFF
+OFF time[s]=170.610218
+Cycles=34, Total time[min]=339.999970
+DUTY=35.310059, HI=211.860352, LO=388.139648, temp=12.901917
+Heater ON
+ON time[s]=211.849137
+Heater OFF
+OFF time[s]=388.139480
+Cycles=35, Total time[min]=349.999969
+DUTY=49.812012, HI=298.872070, LO=301.127930, temp=12.861633
+Heater ON
+ON time[s]=298.860795
+Heater OFF
+OFF time[s]=301.127777
+Cycles=36, Total time[min]=359.999968
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390111
+Heater OFF
+OFF time[s]=83.598497
+Cycles=37, Total time[min]=369.999967
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390071
+Heater OFF
+OFF time[s]=83.598497
+Cycles=38, Total time[min]=379.999966
+DUTY=46.186523, HI=277.119141, LO=322.880859, temp=12.871704
+Heater ON
+ON time[s]=277.107892
+Heater OFF
+OFF time[s]=322.880711
+Cycles=39, Total time[min]=389.999965
+DUTY=31.684570, HI=190.107422, LO=409.892578, temp=12.911987
+Heater ON
+ON time[s]=190.096096
+Heater OFF
+OFF time[s]=409.892414
+Cycles=40, Total time[min]=399.999964
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131292
+Heater OFF
+OFF time[s]=148.857283
+Cycles=41, Total time[min]=409.999963
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390069
+Heater OFF
+OFF time[s]=83.598502
+Cycles=42, Total time[min]=419.999962
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119579
+Heater OFF
+OFF time[s]=235.868986
+Cycles=43, Total time[min]=429.999961
+DUTY=24.433594, HI=146.601562, LO=453.398438, temp=12.932129
+Heater ON
+ON time[s]=146.590285
+Heater OFF
+OFF time[s]=453.398272
+Cycles=44, Total time[min]=439.999960
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378355
+Heater OFF
+OFF time[s]=170.610226
+Cycles=45, Total time[min]=449.999959
+DUTY=86.066895, HI=516.401367, LO=83.598633, temp=12.760925
+Heater ON
+ON time[s]=516.390038
+Heater OFF
+OFF time[s]=83.598496
+Cycles=46, Total time[min]=459.999958
+DUTY=64.313965, HI=385.883789, LO=214.116211, temp=12.821350
+Heater ON
+ON time[s]=385.872499
+Heater OFF
+OFF time[s]=214.116064
+Cycles=47, Total time[min]=469.999957
+DUTY=31.684570, HI=190.107422, LO=409.892578, temp=12.911987
+Heater ON
+ON time[s]=190.096147
+Heater OFF
+OFF time[s]=409.892412
+Cycles=48, Total time[min]=479.999956
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119561
+Heater OFF
+OFF time[s]=235.868994
+Cycles=49, Total time[min]=489.999955
+DUTY=75.190430, HI=451.142578, LO=148.857422, temp=12.791138
+Heater ON
+ON time[s]=451.131278
+Heater OFF
+OFF time[s]=148.857283
+Cycles=50, Total time[min]=499.999954
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378346
+Heater OFF
+OFF time[s]=170.610212
+Cycles=51, Total time[min]=509.999953
+DUTY=49.812012, HI=298.872070, LO=301.127930, temp=12.861633
+Heater ON
+ON time[s]=298.860833
+Heater OFF
+OFF time[s]=301.127777
+Cycles=52, Total time[min]=519.999952
+DUTY=46.186523, HI=277.119141, LO=322.880859, temp=12.871704
+Heater ON
+ON time[s]=277.107851
+Heater OFF
+OFF time[s]=322.880708
+Cycles=53, Total time[min]=529.999951
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378344
+Heater OFF
+OFF time[s]=170.610217
+Cycles=54, Total time[min]=539.999950
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378337
+Heater OFF
+OFF time[s]=170.610215
+Cycles=55, Total time[min]=549.999949
+DUTY=46.186523, HI=277.119141, LO=322.880859, temp=12.871704
+Heater ON
+ON time[s]=277.107846
+Heater OFF
+OFF time[s]=322.880712
+Cycles=56, Total time[min]=559.999948
+DUTY=49.812012, HI=298.872070, LO=301.127930, temp=12.861633
+Heater ON
+ON time[s]=298.860781
+Heater OFF
+OFF time[s]=301.127776
+Cycles=57, Total time[min]=569.999947
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378396
+Heater OFF
+OFF time[s]=170.610212
+Cycles=58, Total time[min]=579.999946
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378349
+Heater OFF
+OFF time[s]=170.610215
+Cycles=59, Total time[min]=589.999945
+DUTY=53.437500, HI=320.625000, LO=279.375000, temp=12.851562
+Heater ON
+ON time[s]=320.613758
+Heater OFF
+OFF time[s]=279.374841
+Cycles=60, Total time[min]=599.999944
+DUTY=49.812012, HI=298.872070, LO=301.127930, temp=12.861633
+Heater ON
+ON time[s]=298.860797
+Heater OFF
+OFF time[s]=301.127773
+Cycles=61, Total time[min]=609.999943
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119567
+Heater OFF
+OFF time[s]=235.868998
+Cycles=62, Total time[min]=619.999942
+DUTY=71.564941, HI=429.389648, LO=170.610352, temp=12.801208
+Heater ON
+ON time[s]=429.378360
+Heater OFF
+OFF time[s]=170.610215
+Cycles=63, Total time[min]=629.999941
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119568
+Heater OFF
+OFF time[s]=235.868994
+Cycles=64, Total time[min]=639.999940
+DUTY=46.186523, HI=277.119141, LO=322.880859, temp=12.871704
+Heater ON
+ON time[s]=277.107867
+Heater OFF
+OFF time[s]=322.880699
+Cycles=65, Total time[min]=649.999939
+DUTY=53.437500, HI=320.625000, LO=279.375000, temp=12.851562
+Heater ON
+ON time[s]=320.613728
+Heater OFF
+OFF time[s]=279.374845
+Cycles=66, Total time[min]=659.999938
+DUTY=64.313965, HI=385.883789, LO=214.116211, temp=12.821350
+Heater ON
+ON time[s]=385.872489
+Heater OFF
+OFF time[s]=214.116069
+Cycles=67, Total time[min]=669.999937
+DUTY=64.313965, HI=385.883789, LO=214.116211, temp=12.821350
+Heater ON
+ON time[s]=385.872500
+Heater OFF
+OFF time[s]=214.116067
+Cycles=68, Total time[min]=679.999936
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119581
+Heater OFF
+OFF time[s]=235.868995
+Cycles=69, Total time[min]=689.999935
+DUTY=53.437500, HI=320.625000, LO=279.375000, temp=12.851562
+Heater ON
+ON time[s]=320.613736
+Heater OFF
+OFF time[s]=279.374842
+Cycles=70, Total time[min]=699.999934
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119598
+Heater OFF
+OFF time[s]=235.868995
+Cycles=71, Total time[min]=709.999933
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119578
+Heater OFF
+OFF time[s]=235.868992
+Cycles=72, Total time[min]=719.999932
+DUTY=53.437500, HI=320.625000, LO=279.375000, temp=12.851562
+Heater ON
+ON time[s]=320.613714
+Heater OFF
+OFF time[s]=279.374847
+Cycles=73, Total time[min]=729.999931
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119609
+Heater OFF
+OFF time[s]=235.868990
+Cycles=74, Total time[min]=739.999930
+DUTY=64.313965, HI=385.883789, LO=214.116211, temp=12.821350
+Heater ON
+ON time[s]=385.872497
+Heater OFF
+OFF time[s]=214.116056
+Cycles=75, Total time[min]=749.999929
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119577
+Heater OFF
+OFF time[s]=235.868986
+Cycles=76, Total time[min]=759.999928
+DUTY=60.688477, HI=364.130859, LO=235.869141, temp=12.831421
+Heater ON
+ON time[s]=364.119567
+Heater OFF
+OFF time[s]=235.868995
+Cycles=77, Total time[min]=769.999927
+DUTY=53.437500, HI=320.625000, LO=279.375000, temp=12.851562
+Heater ON
+
