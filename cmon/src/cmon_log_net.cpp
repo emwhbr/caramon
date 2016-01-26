@@ -64,14 +64,15 @@ void cmon_log_net::finalize(void)
 
 ////////////////////////////////////////////////////////////////
 
-void cmon_log_net::log_climate_data(const CMON_CLIMATE_DATA *data)
+void cmon_log_net::log_data(const CMON_CLIMATE_DATA *climate_data,
+			    const CMON_CONTROLLER_DATA *controller_data)
 {
   // NOTE!
   // Sends data to Thingspeak channel using curl.
   // Channel is updated with the following command syntax:
   /*
    * curl --fail --silent \
-   *      --data "key=<WRITE_KEY>&field1=<value1>&field2=<value2>&field3=<value3>" \
+   *      --data "key=<WRITE_KEY>&field1=<value1>&field2=<value2>&field3=<value3>&field4=<value4>&field5=<value5>" \
    *      https://api.thingspeak.com/update
   */
 
@@ -81,24 +82,34 @@ void cmon_log_net::log_climate_data(const CMON_CLIMATE_DATA *data)
   curl_cmd += (" \"key=" + string(THINGSPEAK_WRITE_API_KEY));
 
   // Internal temperature (Field 1)
-  if (data->internal_temperature.valid) {
+  if (climate_data->internal_temperature.valid) {
     ossMsg.str("");
-    ossMsg << fixed << setprecision(3) << data->internal_temperature.mean;
+    ossMsg << fixed << setprecision(3) << climate_data->internal_temperature.mean;
     curl_cmd += ("&field1=" + ossMsg.str());
   }
 
   // Internal humidity (Field 2)
-  if (data->internal_humidity.valid) {
+  if (climate_data->internal_humidity.valid) {
     ossMsg.str("");
-    ossMsg << fixed << setprecision(3) << data->internal_humidity.mean;
+    ossMsg << fixed << setprecision(3) << climate_data->internal_humidity.mean;
     curl_cmd += ("&field2=" + ossMsg.str());
   }
 
   // External temperature (Field 3)
-  if (data->external_temperature.valid) {
+  if (climate_data->external_temperature.valid) {
     ossMsg.str("");
-    ossMsg << fixed << setprecision(3) << data->external_temperature.mean;
+    ossMsg << fixed << setprecision(3) << climate_data->external_temperature.mean;
     curl_cmd += ("&field3=" + ossMsg.str());
+  }
+
+  // Controller PID (Field 4=duty, Field 5=set value)
+  if (controller_data->temp_controller.valid) {
+    ossMsg.str("");
+    ossMsg << fixed << setprecision(2) << controller_data->temp_controller.duty;
+    curl_cmd += ("&field4=" + ossMsg.str());
+    ossMsg.str("");
+    ossMsg << fixed << setprecision(3) << controller_data->temp_controller.set_value;
+    curl_cmd += ("&field5=" + ossMsg.str());
   }
 
   curl_cmd += "\" ";

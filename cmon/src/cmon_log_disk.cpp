@@ -63,41 +63,55 @@ void cmon_log_disk::finalize(void)
 
 ////////////////////////////////////////////////////////////////
 
-void cmon_log_disk::log_climate_data(const CMON_CLIMATE_DATA *data)
+void cmon_log_disk::log_data(const CMON_CLIMATE_DATA *climate_data,
+			     const CMON_CONTROLLER_DATA *controller_data)
 {
   // NOTE!
   // Creates an entry in climate data file according to:
-  // <date&time>;<internal mean temp>;<internal mean hum>;<external mean temp>;
+  // <date&time>;<internal mean temp>;<internal mean hum>;<external mean temp>;<pid duty>;<pid set value>
 
-  // Decorate message with date and time
+  // Decorate message with date and time (from climate data)
   ostringstream ossMsg;
   ossMsg.str("");
-  ossMsg << this->get_iso8601_date_time_str(&data->time.tstruct) << ";";
+  ossMsg << this->get_iso8601_date_time_str(&climate_data->time.tstruct) << ";";
 
   // Internal climate
-  if (data->internal_temperature.valid) {
+  if (climate_data->internal_temperature.valid) {
     ossMsg << fixed << setw(8) << setprecision(3)
-	   << data->internal_temperature.mean << ";";
+	   << climate_data->internal_temperature.mean << ";";
   }
   else {
     ossMsg << "not valid" << ";";
   }
-  if (data->internal_humidity.valid) {    
+  if (climate_data->internal_humidity.valid) {    
     ossMsg << fixed << setw(8) << setprecision(3)
-	   << data->internal_humidity.mean << ";";
+	   << climate_data->internal_humidity.mean << ";";
   }
   else {
     ossMsg << "not valid" << ";";
   }
 
   // External climate
-  if (data->external_temperature.valid) {
+  if (climate_data->external_temperature.valid) {
     ossMsg << fixed << setw(8) << setprecision(3)
-	   << data->external_temperature.mean << ";";
+	   << climate_data->external_temperature.mean << ";";
   }
   else {
     ossMsg << "not valid" << ";";
   }
+
+  // Controller PID
+  if (controller_data->temp_controller.valid) {
+    ossMsg << fixed << setw(8) << setprecision(2)
+	   << controller_data->temp_controller.duty << ";";
+    ossMsg << fixed << setw(8) << setprecision(3)
+	   << controller_data->temp_controller.set_value << ";";
+  }
+  else {
+    ossMsg << "not valid" << ";";
+    ossMsg << "not valid" << ";";
+  }
+
   ossMsg << "\n";
 
   // Log to file

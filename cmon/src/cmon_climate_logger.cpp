@@ -20,8 +20,8 @@
 /////////////////////////////////////////////////////////////////////////////
 //               Definitions of macros
 /////////////////////////////////////////////////////////////////////////////
-#define MAX_CONSECUTIVE_LOG_DISK_ERRORS  10
-#define MAX_CONSECUTIVE_LOG_NET_ERRORS   10
+#define MAX_CONSECUTIVE_LOG_DISK_ERRORS   12 // Approx.  1 hour @ 5 minutes interval
+#define MAX_CONSECUTIVE_LOG_NET_ERRORS   144 // Approx. 12 hour @ 5 minutes interval
 
 /////////////////////////////////////////////////////////////////////////////
 //               Public member functions
@@ -34,6 +34,8 @@ cmon_climate_logger(string thread_name,
 		    uint32_t cpu_affinity_mask,
 		    int rt_priority,
 		    cmon_climate_data_queue *climate_data_queue,
+		    cmon_controller_data_queue *controller_data_queue,
+		    bool enable_temp_ctrl,
 		    bool disable_disk_log,
 		    bool disable_net_log,
 		    bool verbose) : thread(thread_name,
@@ -45,12 +47,14 @@ cmon_climate_logger(string thread_name,
 		this->get_name().c_str());
   }
 
+  m_enable_temp_ctrl = enable_temp_ctrl;
   m_disable_disk_log = disable_disk_log;
   m_disable_net_log = disable_net_log;
   m_verbose = verbose;
   m_shutdown_requested = false;
 
   m_climate_data_queue = climate_data_queue;
+  m_controller_data_queue = controller_data_queue;
 
   m_log_disk = new cmon_log_disk(this->get_name() + "-DISK",
 				 m_verbose,
@@ -228,24 +232,38 @@ void cmon_climate_logger::finalize_climate_logger(void)
 
 void cmon_climate_logger::handle_climate_logger(void)
 {
-  CMON_CLIMATE_DATA climate_data;
+  CMON_CLIMATE_DATA climate_data;  
   bool climate_data_received;
 
+  CMON_CONTROLLER_DATA controller_data;
+  bool controller_data_received;
+
+  climate_data.internal_temperature.valid = false;
+  climate_data.internal_humidity.valid = false;
+  climate_data.external_temperature.valid = false;
+
+  controller_data.temp_controller.valid = false;
+
   while (!is_stopped()) {
-    ///////////////////////////////
-    // Wait for new climate data
-    ///////////////////////////////
-    this->recv_climate_data(&climate_data, 1.0, climate_data_received);
-    if (!climate_data_received) {
-      cmon_nanosleep(0.1);
+    // Wait for data from queues
+    this->recv_climate_data(&climate_data, 0.5, climate_data_received);
+    if (m_enable_temp_ctrl) {
+      this->recv_controller_data(&controller_data, 0.5, controller_data_received);
     }
     else {
-      ////////////////////////////
-      // Log new climate data
-      ////////////////////////////
-      if (m_verbose) {
-	this->print_climate_data(&climate_data);
-      }
+      controller_data_received = false;
+      controller_data.temp_controller.valid = false;
+    }
+
+    if (m_verbose && climate_data_received) {
+      this->print_climate_data(&climate_data);
+    }
+    if (m_verbose && controller_data_received) {
+      this->print_controller_data(&controller_data);
+    }
+
+    // Log data
+    if (climate_data_received) { // Climate data is produced at slowest rate       
       // There is no point continue when permanent
       // fault in disk logger is detected.
       if (!m_disable_disk_log) {
@@ -254,14 +272,16 @@ void cmon_climate_logger::handle_climate_logger(void)
 		    "Log disk permanent fault", NULL);
 	}
 	else {
-	  this->log_disk(&climate_data); // Log to disk
+	  this->log_disk(&climate_data,
+			 &controller_data); // Log to disk
 	}
       }
       
       // We can manage without net logger
       if (!m_disable_net_log) {
 	if (!m_log_net_permanent_fault) {
-	  this->log_net(&climate_data); // Log to network
+	  this->log_net(&climate_data,
+			&controller_data); // Log to network
 	}
       }
     }
@@ -323,9 +343,36 @@ void cmon_climate_logger::recv_climate_data(CMON_CLIMATE_DATA *data,
 
 ////////////////////////////////////////////////////////////////
 
+void cmon_climate_logger::recv_controller_data(CMON_CONTROLLER_DATA *data,
+					       double timeout_in_sec,
+					       bool &data_received)
+{
+  long rc;
+  cmon_controller_data *controller_data_p = NULL;
+
+  // Get controller data from queue
+  rc = m_controller_data_queue->recv(controller_data_p, timeout_in_sec);
+  if (rc != CMON_CONTROLLER_DATA_QUEUE_SUCCESS) {
+    if (rc == CMON_CONTROLLER_DATA_QUEUE_TIMEDOUT) {
+      data_received = false;
+    }
+    else {
+      THROW_EXP(CMON_INTERNAL_ERROR, CMON_MSG_QUEUE_ERROR,
+		"Receive controller data queue failed", NULL);
+    }    
+  }
+  else {
+    data_received = true;
+    memcpy(data, &controller_data_p->m_controller_data, sizeof(*data));
+    m_controller_data_queue->deallocate_pool(controller_data_p);
+  }
+}
+
+////////////////////////////////////////////////////////////////
+
 void cmon_climate_logger::print_climate_data(const CMON_CLIMATE_DATA *data)
 {
-  cmon_io_put("%s : ========== NEW DATA ===========\n",
+  cmon_io_put("%s : ========== NEW CLIMATE DATA ===========\n",
 	      this->get_name().c_str());
   
   if (data->internal_temperature.valid) {
@@ -339,7 +386,7 @@ void cmon_climate_logger::print_climate_data(const CMON_CLIMATE_DATA *data)
     cmon_io_put("%s : internal temp NOT valid\n", this->get_name().c_str());
   }
   if (data->internal_humidity.valid) {
-    cmon_io_put("%s : internal hum , min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
+    cmon_io_put("%s : internal hum, min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
 		this->get_name().c_str(),
 		data->internal_humidity.min,
 		data->internal_humidity.max,
@@ -362,7 +409,26 @@ void cmon_climate_logger::print_climate_data(const CMON_CLIMATE_DATA *data)
 
 ////////////////////////////////////////////////////////////////
 
-void cmon_climate_logger::log_disk(const CMON_CLIMATE_DATA *data)
+void cmon_climate_logger::print_controller_data(const CMON_CONTROLLER_DATA *data)
+{
+  cmon_io_put("%s : ========== NEW CONTROLLER DATA ===========\n",
+	      this->get_name().c_str());
+
+  if (data->temp_controller.valid) {
+    cmon_io_put("%s : temp controller, duty=%-8.2f, set_value=%+-8.3f\n",
+		this->get_name().c_str(),
+		data->temp_controller.duty,
+		data->temp_controller.set_value);
+  }
+  else {
+    cmon_io_put("%s : temp controller NOT valid\n", this->get_name().c_str());
+  }
+}
+
+////////////////////////////////////////////////////////////////
+
+void cmon_climate_logger::log_disk(const CMON_CLIMATE_DATA *climate_data,
+				   const CMON_CONTROLLER_DATA *controller_data)
 {
   bool log_error;
   string log_error_info;
@@ -373,7 +439,8 @@ void cmon_climate_logger::log_disk(const CMON_CLIMATE_DATA *data)
   // To many consecutive errors, and we will assume
   // some kind of permanent fault.
   try {
-    m_log_disk->log_climate_data(data);
+    m_log_disk->log_data(climate_data,
+			 controller_data);
   }
   catch (cmon_exception &cxp) {
     log_error = true;
@@ -399,7 +466,8 @@ void cmon_climate_logger::log_disk(const CMON_CLIMATE_DATA *data)
 
 ////////////////////////////////////////////////////////////////
 
-void cmon_climate_logger::log_net(const CMON_CLIMATE_DATA *data)
+void cmon_climate_logger::log_net(const CMON_CLIMATE_DATA *climate_data,
+				  const CMON_CONTROLLER_DATA *controller_data)
 {
   bool log_error;
   string log_error_info;
@@ -410,7 +478,8 @@ void cmon_climate_logger::log_net(const CMON_CLIMATE_DATA *data)
   // To many consecutive errors, and we will assume
   // some kind of permanent fault.
   try {
-    m_log_net->log_climate_data(data);
+    m_log_net->log_data(climate_data,
+			controller_data);
   }
   catch (cmon_exception &cxp) {
     log_error = true;

@@ -34,10 +34,11 @@ class cmon_log_net : public cmon_log {
 	       bool verbose);
   ~cmon_log_net(void);
 
-  void initialize(void);  // Implements pure virtual functions from base class
-  void finalize(void);    // Implements pure virtual functions from base class
-  void log_climate_data(const CMON_CLIMATE_DATA *data); // Implements pure virtual functions from base class
-
+  // Implements pure virtual functions from base class
+  void initialize(void);
+  void finalize(void);
+  void log_data(const CMON_CLIMATE_DATA *climate_data,
+		const CMON_CONTROLLER_DATA *controller_data);
  private:
   shell_cmd m_sc;
 

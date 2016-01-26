@@ -35,10 +35,11 @@ class cmon_log_disk : public cmon_log {
 		string climate_data_file_name);
   ~cmon_log_disk(void);
 
-  void initialize(void);  // Implements pure virtual functions from base class
-  void finalize(void);    // Implements pure virtual functions from base class
-  void log_climate_data(const CMON_CLIMATE_DATA *data); // Implements pure virtual functions from base class
-
+  // Implements pure virtual functions from base class
+  void initialize(void);
+  void finalize(void);
+  void log_data(const CMON_CLIMATE_DATA *climate_data,
+		const CMON_CONTROLLER_DATA *controller_data);
  private:
   cmon_file *m_climate_data_file;
 };

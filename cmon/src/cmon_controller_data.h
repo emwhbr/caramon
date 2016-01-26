@@ -1,6 +1,6 @@
 // ************************************************************************
 // *                                                                      *
-// * Copyright (C) 2015 Bonden i Nol (hakanbrolin@hotmail.com)            *
+// * Copyright (C) 2016 Bonden i Nol (hakanbrolin@hotmail.com)            *
 // *                                                                      *
 // * This program is free software; you can redistribute it and/or modify *
 // * it under the terms of the GNU General Public License as published by *
@@ -9,17 +9,10 @@
 // *                                                                      *
 // ************************************************************************
 
-#ifndef __CMON_CORE_H__
-#define __CMON_CORE_H__
+#ifndef __CMON_CONTROLLER_DATA_H__
+#define __CMON_CONTROLLER_DATA_H__
 
-#include <memory>
-
-#include "cmon_alive.h"
-#include "cmon_climate_sampler.h"
-#include "cmon_climate_logger.h"
-#include "cmon_temp_controller.h"
-#include "cmon_climate_data_queue.h"
-#include "cmon_controller_data_queue.h"
+#include <time.h>
 
 using namespace std;
 
@@ -30,41 +23,30 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //               Class support types
 /////////////////////////////////////////////////////////////////////////////
+typedef struct {
+  struct tm tstruct;
+} CMON_CONTROLLER_TIME;
+
+typedef struct {
+  bool  valid;
+  float duty;
+  float set_value;
+} CMON_CONTROLLER_ITEM;
+
+typedef struct {
+  CMON_CONTROLLER_TIME time;
+  CMON_CONTROLLER_ITEM temp_controller;
+} CMON_CONTROLLER_DATA;
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of classes
 /////////////////////////////////////////////////////////////////////////////
-class cmon_core {
+class cmon_controller_data {
  public:
-  cmon_core(bool disable_disk_log,
-	    bool disable_net_log,
-	    bool enable_temp_ctrl,
-	    bool verbose);
-  ~cmon_core(void);
+  cmon_controller_data(void);
+  virtual ~cmon_controller_data(void);
   
-  void initialize(void);
-  void finalize(void);
-  void check_ok(void);
-  
- private:
-  bool m_disable_disk_log;
-  bool m_disable_net_log;
-  bool m_enable_temp_ctrl;
-  bool m_verbose;
-
-  // Queues
-  cmon_climate_data_queue    *m_climate_data_queue;
-  cmon_controller_data_queue *m_controller_data_queue;
-
-  // Threads
-  auto_ptr<cmon_alive> m_alive_auto;
-  auto_ptr<cmon_climate_sampler> m_climate_sampler_auto;
-  auto_ptr<cmon_climate_logger> m_climate_logger_auto;
-  auto_ptr<cmon_temp_controller> m_temp_controller_auto;
-
-  void setup_climate_control(void);
-  void cleanup_climate_control(void);
-  void check_climate_control(void);
+  CMON_CONTROLLER_DATA m_controller_data;
 };
 
-#endif // __CMON_CORE_H__
+#endif // __CMON_CONTROLLER_DATA_H__

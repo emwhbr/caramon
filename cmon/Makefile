@@ -18,17 +18,20 @@ APP_OBJS = $(OBJ_DIR)/cmon_alive.o \
            $(OBJ_DIR)/cmon_climate_data_queue.o \
            $(OBJ_DIR)/cmon_climate_logger.o \
            $(OBJ_DIR)/cmon_climate_sampler.o \
+           $(OBJ_DIR)/cmon_controller_data.o \
+           $(OBJ_DIR)/cmon_controller_data_queue.o \
            $(OBJ_DIR)/cmon_core.o \
            $(OBJ_DIR)/cmon_exception.o \
-           $(OBJ_DIR)/cmon_external_climate.o \
+           $(OBJ_DIR)/cmon_ext_sensor.o \
            $(OBJ_DIR)/cmon_file.o \
-           $(OBJ_DIR)/cmon_internal_climate.o \
+           $(OBJ_DIR)/cmon_int_sensor.o \
            $(OBJ_DIR)/cmon_io.o \
            $(OBJ_DIR)/cmon_led.o \
            $(OBJ_DIR)/cmon_log.o \
            $(OBJ_DIR)/cmon_log_disk.o \
            $(OBJ_DIR)/cmon_log_net.o \
            $(OBJ_DIR)/cmon_main.o \
+           $(OBJ_DIR)/cmon_temp_controller.o \
            $(OBJ_DIR)/cmon_thread_utility.o \
            $(OBJ_DIR)/cmon_utility.o \
            $(OBJ_DIR)/delay.o \
@@ -39,6 +42,7 @@ APP_OBJS = $(OBJ_DIR)/cmon_alive.o \
            $(OBJ_DIR)/io_pin_in.o \
            $(OBJ_DIR)/io_pin_out.o \
            $(OBJ_DIR)/shell_cmd.o \
+           $(OBJ_DIR)/pid_ctrl.o \
            $(OBJ_DIR)/signal_support.o \
            $(OBJ_DIR)/socket_support.o \
            $(OBJ_DIR)/thread.o \

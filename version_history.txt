@@ -1,4 +1,16 @@
 ==================================================================
+26/1-2016 EMWHBR
+
+* R1A04
+
+* CMON
+  - R1A02
+  - Added PID control of internal temperature.
+  - Radiator is regulated using slow PWM with a RC power socket.
+  - New entrires in log function for temperature controller (duty, set-value).
+  - Changed implementation of interfaces for internal and external sensors.
+
+==================================================================
 23/1-2016 EMWHBR
 
 * R1A03

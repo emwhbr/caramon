@@ -16,6 +16,7 @@
 #include <string>
 
 #include "cmon_climate_data_queue.h"
+#include "cmon_controller_data_queue.h"
 #include "cmon_log_disk.h"
 #include "cmon_log_net.h"
 #include "thread.h"
@@ -39,6 +40,8 @@ class cmon_climate_logger : public thread {
 		      uint32_t cpu_affinity_mask,
 		      int rt_priority,
 		      cmon_climate_data_queue *climate_data_queue,
+		      cmon_controller_data_queue *controller_data_queue,
+		      bool enable_temp_ctrl,
 		      bool disable_disk_log,
 		      bool disable_net_log,
 		      bool verbose);
@@ -53,6 +56,7 @@ class cmon_climate_logger : public thread {
   virtual long execute(void *arg);  // Implements pure virtual functions from base class
 
  private:
+  bool m_enable_temp_ctrl;
   bool m_disable_disk_log;
   bool m_disable_net_log;
   bool m_verbose;
@@ -62,7 +66,9 @@ class cmon_climate_logger : public thread {
 
   // QUEUE                   PRODUCER           CONSUMER
   // Climate data queue      External thread    Internal thread
-  cmon_climate_data_queue *m_climate_data_queue;
+  // Controller data queue   External thread    Internal thread
+  cmon_climate_data_queue    *m_climate_data_queue;
+  cmon_controller_data_queue *m_controller_data_queue;
 
   // Disk logger
   cmon_log_disk *m_log_disk;
@@ -85,11 +91,19 @@ class cmon_climate_logger : public thread {
 			 double timeout_in_sec,
 			 bool &data_received);
 
+  void recv_controller_data(CMON_CONTROLLER_DATA *data,
+			    double timeout_in_sec,
+			    bool &data_received);
+
   void print_climate_data(const CMON_CLIMATE_DATA *data);
 
-  void log_disk(const CMON_CLIMATE_DATA *data);
+  void print_controller_data(const CMON_CONTROLLER_DATA *data);
 
-  void log_net(const CMON_CLIMATE_DATA *data);  
+  void log_disk(const CMON_CLIMATE_DATA *climate_data,
+		const CMON_CONTROLLER_DATA *controller_data);
+
+  void log_net(const CMON_CLIMATE_DATA *climate_data,
+	       const CMON_CONTROLLER_DATA *controller_data);  
 };
 
 #endif // __CMON_CLIMATE_LOGGER_H__

@@ -16,6 +16,7 @@
 #include <string>
 
 #include "cmon_climate_data.h"
+#include "cmon_controller_data.h"
 
 using namespace std;
 
@@ -36,10 +37,11 @@ class cmon_log {
 	   bool verbose);
   virtual ~cmon_log(void);
   
-  virtual void initialize(void) = 0; // Pure virtual function
-  virtual void finalize(void) = 0;   // Pure virtual function
-  virtual void log_climate_data(const CMON_CLIMATE_DATA *data) = 0; // Pure virtual function
-  
+  // Pure virtual functions
+  virtual void initialize(void) = 0;
+  virtual void finalize(void) = 0;
+  virtual void log_data(const CMON_CLIMATE_DATA *climate_data,
+			const CMON_CONTROLLER_DATA *controller_data) = 0;  
  protected:
   string m_name;
   bool   m_verbose;

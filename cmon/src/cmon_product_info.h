@@ -16,6 +16,6 @@
 //               Definitions of macros
 /////////////////////////////////////////////////////////////////////////////
 #define CMON_PRODUCT_NUMBER "CMON"
-#define CMON_RSTATE         "R1A01"
+#define CMON_RSTATE         "R1A02"
 
 #endif // __CMON_PRODUCT_INFO_H__

@@ -1,6 +1,6 @@
 // ************************************************************************
 // *                                                                      *
-// * Copyright (C) 2015 Bonden i Nol (hakanbrolin@hotmail.com)            *
+// * Copyright (C) 2016 Bonden i Nol (hakanbrolin@hotmail.com)            *
 // *                                                                      *
 // * This program is free software; you can redistribute it and/or modify *
 // * it under the terms of the GNU General Public License as published by *
@@ -9,36 +9,27 @@
 // *                                                                      *
 // ************************************************************************
 
-#ifndef __CMON_INTERNAL_CLIMATE_H__
-#define __CMON_INTERNAL_CLIMATE_H__
-
-#include "hdc1008_io.h"
+#ifndef __CMON_EXT_SENSOR_H__
+#define __CMON_EXT_SENSOR_H__
 
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
-//               Class support types
+//               Definition of macros
 /////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
-//               Definition of classes
+//               Definition of types
 /////////////////////////////////////////////////////////////////////////////
-class cmon_internal_climate {
-public:
-  cmon_internal_climate(void);
-  ~cmon_internal_climate(void);
 
-  void initialize(void);
-  void finalize(void);
+/////////////////////////////////////////////////////////////////////////////
+//               Definition of exported functions
+/////////////////////////////////////////////////////////////////////////////
 
-  float get_temperature(void);
-  float get_humidity(void);
+extern void cmon_ext_sensor_initialize(void);
 
- private:
-  // HDC1008 temperature/humidity sensor object pointer
-  hdc1008_io *m_hdc1008_io_ptr;
+extern void cmon_ext_sensor_finalize(void);
 
-  void handle_hdc1008_exception(long rc);
-};
+extern float cmon_ext_sensor_get_temperature(void);
 
-#endif // __CMON_INTERNAL_CLIMATE_H__
+#endif // __CMON_EXT_SENSOR_H__

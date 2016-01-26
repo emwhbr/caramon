@@ -71,9 +71,10 @@ static the_terminate_handler g_terminate_handler;
 // Set by command line arguments
 static int g_disk_no_log = 0;
 static int g_net_no_log = 0;
+static int g_pid_ctrl = 0;
+static int g_verbose = 0;
 static string g_logfile = "";
 static string g_terminate_errorfile = "";
-static int g_verbose = 0;
 
 // CMON core object pointer
 static cmon_core *g_cmon_core = NULL;
@@ -110,6 +111,7 @@ static bool app_parse_command_line(int argc, char *argv[])
     {"help",            no_argument,       0, 'h'},
     {"log",             required_argument, 0, 'l'},
     {"net-no-log",      no_argument,       0, 'n'},
+    {"pid-ctrl",        no_argument,       0, 'p'},
     {"terminate-error", required_argument, 0, 't'},
     {"verbose",         no_argument,       0, 'v'},
     {"version",         no_argument,       0, 'V'},
@@ -122,7 +124,7 @@ static bool app_parse_command_line(int argc, char *argv[])
   }
 
   while (1) {
-    c = getopt_long(argc, argv, "dhl:nt:vV",
+    c = getopt_long(argc, argv, "dhl:npt:vV",
 		    long_options, &option_index);
     
     // Detect the end of the options
@@ -153,6 +155,10 @@ static bool app_parse_command_line(int argc, char *argv[])
 
     case 'n':
       g_net_no_log = 1;
+      break;
+
+    case 'p':
+      g_pid_ctrl = 1;
       break;
 
     case 't':
@@ -188,7 +194,7 @@ static void app_report_help(const char *app_name)
 	  << "options\n\n"
 
 	  << "-d, --disk-no-log\n"
-	  << "    Disables data logging to local disk.\n\n"
+	  << "    Disable data logging to local disk.\n\n"
 
 	  << "-h, --help\n"
 	  << "    Print help information and exit.\n\n"
@@ -197,7 +203,10 @@ static void app_report_help(const char *app_name)
 	  << "    Logfile for progress information.\n\n"
 
 	  << "-n, --net-no-log\n"
-	  << "    Disables data logging to network.\n\n"
+	  << "    Disable data logging to network.\n\n"
+
+	  << "-p, --pid-ctrl\n"
+	  << "    Enable PID temperature controller.\n\n"
 
 	  << "-t, --terminate-error <full-path-to-error-file>\n"
 	  << "    File for counting bad terminations.\n\n"
@@ -237,6 +246,7 @@ static void app_report_switches(void)
   oss_msg << "\tdisk-no-log     : " << (g_disk_no_log ? "on" : "off") << "\n";
   oss_msg << "\tlogfile         : " << g_logfile << "\n";
   oss_msg << "\tnet-no-log      : " << (g_net_no_log ? "on" : "off") << "\n";
+  oss_msg << "\tpid-ctrl        : " << (g_pid_ctrl ? "on" : "off") << "\n";
   oss_msg << "\tterminate-error : " << g_terminate_errorfile << "\n";
   oss_msg << "\tverbose         : " << (g_verbose ? "on" : "off");
 
@@ -328,6 +338,7 @@ static bool cmon_initialize(void)
   // Create the CMON core object
   g_cmon_core = new cmon_core(g_disk_no_log == 1,
                               g_net_no_log == 1,
+			      g_pid_ctrl == 1,
                               g_verbose == 1);
   
   // Initialize and start CMON

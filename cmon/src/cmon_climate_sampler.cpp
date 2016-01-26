@@ -12,6 +12,8 @@
 #include <string.h>
 
 #include "cmon_climate_sampler.h"
+#include "cmon_int_sensor.h"
+#include "cmon_ext_sensor.h"
 #include "cmon_io.h"
 #include "cmon_exception.h"
 #include "cmon_utility.h"
@@ -23,7 +25,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #define CLIMATE_SAMPLE_INTERVAL   5.0  // [s]
 #define CLIMATE_LOG_INTERVAL     (5 * 60.0)  // [s]
-//#define CLIMATE_LOG_INTERVAL     (10.0)  // [s] JOE: Fore testing
+//#define CLIMATE_LOG_INTERVAL     (10.0)  // [s] JOE: For testing
 
 #define MAX_CONSECUTIVE_INTERNAL_CLIMATE_SENSOR_ERRORS  8
 #define MAX_CONSECUTIVE_EXTERNAL_CLIMATE_SENSOR_ERRORS  8
@@ -53,13 +55,11 @@ cmon_climate_sampler(string thread_name,
 
   m_climate_data_queue = climate_data_queue;
 
-  m_internal_climate = new cmon_internal_climate();
   m_internal_climate_sensor_error_cnt = 0;
   m_internal_climate_sensor_permanent_fault = false;
   m_internal_temperature_stats.reset();
   m_internal_humidity_stats.reset();
 
-  m_external_climate = new cmon_external_climate();
   m_external_climate_sensor_error_cnt = 0;
   m_external_climate_sensor_permanent_fault = false;
   m_external_temperature_stats.reset();
@@ -73,9 +73,6 @@ cmon_climate_sampler::~cmon_climate_sampler(void)
     cmon_io_put("%s : cmon_climate_sampler::~cmon_climate_sampler\n",
 		this->get_name().c_str());
   }
-  
-  delete m_internal_climate;
-  delete m_external_climate;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -206,16 +203,12 @@ long cmon_climate_sampler::execute(void *arg)
 
 void cmon_climate_sampler::initialize_climate_sampler(void)
 {
-  m_internal_climate->initialize();
-  m_external_climate->initialize();
 }
 
 ////////////////////////////////////////////////////////////////
 
 void cmon_climate_sampler::finalize_climate_sampler(void)
 {
-  m_internal_climate->finalize();
-  m_external_climate->finalize();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -242,7 +235,6 @@ void cmon_climate_sampler::handle_climate_sampler(void)
     THROW_EXP(CMON_LINUX_ERROR, CMON_TIME_ERROR,
 	      "Failed to get sampler start time", NULL);
   }
-
   climate_timer.reset();
   while (!is_stopped()) {
     //////////////////////////////////////////
@@ -277,7 +269,8 @@ void cmon_climate_sampler::handle_climate_sampler(void)
     ///////////////////////////////////
     // Check if time to log climate
     ///////////////////////////////////
-    if (climate_timer.get_elapsed_time() >= CLIMATE_LOG_INTERVAL) {
+    // Compensate for early wake up
+    if (climate_timer.get_elapsed_time() >= (CLIMATE_LOG_INTERVAL - 0.010)) {
 
       // Allocate climate data from pool
       cmon_climate_data *climate_data_p = NULL;
@@ -337,8 +330,8 @@ void cmon_climate_sampler::sample_internal_climate(float &temperature,
   // To many consecutive errors, and we will assume
   // some kind of permanent fault.
   try {
-    temperature = m_internal_climate->get_temperature();
-    humidity = m_internal_climate->get_humidity();
+    temperature = cmon_int_sensor_get_temperature();
+    humidity = cmon_int_sensor_get_humidity();
   }
   catch (cmon_exception &cxp) {
     sensor_error = true;
@@ -381,7 +374,7 @@ void cmon_climate_sampler::sample_external_climate(float &temperature,
   // To many consecutive errors, and we will assume
   // some kind of permanent fault.
   try {
-    temperature = m_external_climate->get_temperature();
+    temperature = cmon_ext_sensor_get_temperature();
   }
   catch (cmon_exception &cxp) {
     sensor_error = true;
