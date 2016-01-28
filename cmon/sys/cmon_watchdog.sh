@@ -15,16 +15,17 @@ CMON_DIR="/caramon"
 CMON_WATCHDOG_LOG=${CMON_DIR}/cmon_watchdog.log
 CMON_TERMINATE_ERROR_FILE=${CMON_DIR}/cmon_terminate_error_cnt
 
+CMON_UTIL="cmon_util.sh"
 CMON_EXE="cmon_rel.arm"
 
-MAX_TERMINATE_ERRORS=5
+MAX_TERMINATE_ERRORS=10
 
 ################################################################
 function get_terminate_errors()
 ################################################################
 {
     errors=0
-    read errors <  ${CMON_TERMINATE_ERROR_FILE}
+    read errors < ${CMON_TERMINATE_ERROR_FILE}
     echo ${errors}
     return 0
 }
@@ -63,10 +64,13 @@ if [ ! -f ${CMON_TERMINATE_ERROR_FILE} ]; then
     exit 0
 fi
 
-# If maximum number of terminate errors is reached, then quit
+# If maximum number of terminate errors is reached, then fallback
 terminate_errors=`get_terminate_errors`
 if [ $terminate_errors -ge ${MAX_TERMINATE_ERRORS} ]; then
-    exit 0
+    date >> ${CMON_WATCHDOG_LOG}
+    echo "About to start fallback" >> ${CMON_WATCHDOG_LOG}
+    ${CMON_DIR}/${CMON_UTIL} fallback
+    exit 0    
 fi
 
 # Time to reboot system

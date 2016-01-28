@@ -23,6 +23,7 @@ APP_OBJS = $(OBJ_DIR)/cmon_alive.o \
            $(OBJ_DIR)/cmon_core.o \
            $(OBJ_DIR)/cmon_exception.o \
            $(OBJ_DIR)/cmon_ext_sensor.o \
+           $(OBJ_DIR)/cmon_fallback.o \
            $(OBJ_DIR)/cmon_file.o \
            $(OBJ_DIR)/cmon_int_sensor.o \
            $(OBJ_DIR)/cmon_io.o \
@@ -31,6 +32,8 @@ APP_OBJS = $(OBJ_DIR)/cmon_alive.o \
            $(OBJ_DIR)/cmon_log_disk.o \
            $(OBJ_DIR)/cmon_log_net.o \
            $(OBJ_DIR)/cmon_main.o \
+           $(OBJ_DIR)/cmon_power_switch.o \
+           $(OBJ_DIR)/cmon_power_switch_rc.o \
            $(OBJ_DIR)/cmon_temp_controller.o \
            $(OBJ_DIR)/cmon_thread_utility.o \
            $(OBJ_DIR)/cmon_utility.o \

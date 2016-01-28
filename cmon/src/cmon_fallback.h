@@ -9,13 +9,11 @@
 // *                                                                      *
 // ************************************************************************
 
-#ifndef __CMON_TEMP_CONTROLLER_H__
-#define __CMON_TEMP_CONTROLLER_H__
+#ifndef __CMON_FALLBACK_H__
+#define __CMON_FALLBACK_H__
 
-#include "cmon_controller_data_queue.h"
-#include "cmon_power_switch.h"
 #include "thread.h"
-#include "pid_ctrl.h"
+#include "cmon_power_switch.h"
 
 using namespace std;
 
@@ -30,15 +28,14 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of classes
 /////////////////////////////////////////////////////////////////////////////
-class cmon_temp_controller : public thread {
+class cmon_fallback : public thread {
  public:
-  cmon_temp_controller(string thread_name,
-		       uint32_t cpu_affinity_mask,
-		       int rt_priority,
-		       cmon_controller_data_queue *ccontroller_data_queue,
-		       bool verbose);
+  cmon_fallback(string thread_name,
+		uint32_t cpu_affinity_mask,
+		int rt_priority,
+		bool verbose);
 
-  ~cmon_temp_controller(void);
+  ~cmon_fallback(void);
 
   void shutdown(void);
 
@@ -49,37 +46,25 @@ class cmon_temp_controller : public thread {
 
  private:
   bool m_verbose;
+  bool m_fallback_led_active;
 
   // Controlled shutdown
   bool m_shutdown_requested;
-
+  
   // Contols wall outlet (230V) for radiator
   cmon_power_switch *m_radiator_switch;
 
-  // QUEUE           PRODUCER           CONSUMER
-  // Data queue      Internal thread    External thread
-  cmon_controller_data_queue *m_controller_data_queue;
-
-  // Temperature PID controller
-  pid_ctrl *m_temp_pid;
-
-  void initialize_temp_controller(void);
-  void finalize_temp_controller(void);
-  void handle_temp_controller(void);
+  void initialize_fallback(void);
+  void finalize_fallback(void);
+  void handle_fallback(void);
 
   // Support functions for the internal thread
-  void check_temp_controller_set_value(void);
-
   void radiator_pulse(bool on,
 		      double pulse_time_sec);
 
   void radiator_on(void);
 
   void radiator_off(void);
-
-  void allocate_controller_data(cmon_controller_data **controller_data);
-
-  void create_controller_data(cmon_controller_data *controller_data);
 };
 
-#endif // __CMON_TEMP_CONTROLLER_H__
+#endif // __CMON_FALLBACK_H__

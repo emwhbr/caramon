@@ -18,8 +18,9 @@ CMON_TERMINATE_ERROR_FILE=${CMON_DIR}/cmon_terminate_error_cnt
 CMON_EXE="cmon_rel.arm"
 CMON_EXE_ARGS="-l ${CMON_LOG_FILE} -t ${CMON_TERMINATE_ERROR_FILE} -p"
 ### No Temp PID: CMON_EXE_ARGS="-l ${CMON_LOG_FILE} -t ${CMON_TERMINATE_ERROR_FILE}"
+CMON_EXE_ARGS_FALLBACK="-l ${CMON_LOG_FILE} -t ${CMON_TERMINATE_ERROR_FILE} -f"
 
-MAX_TERMINATE_ERRORS=5
+MAX_TERMINATE_ERRORS=10
 
 SIG_TERMINATE_CMON="SIGTERM"
 
@@ -104,6 +105,14 @@ function do_start()
 }
 
 ################################################################
+function do_fallback()
+################################################################
+{
+    echo "Start CMON (fallback)"
+    ${CMON_DIR}/${CMON_EXE} ${CMON_EXE_ARGS_FALLBACK} &
+}
+
+################################################################
 function do_shutdown()
 ################################################################
 {
@@ -127,12 +136,16 @@ case "$1" in
 	do_start
         ;;
 
+    fallback)
+	do_fallback
+	;;
+
     shutdown)
 	do_shutdown
         ;;
 
     *)
-        echo "Usage $0 {start|shutdown}"
+        echo "Usage $0 {start|fallback|shutdown}"
         exit 1
         ;;
 esac

@@ -69,6 +69,7 @@ public:
 static the_terminate_handler g_terminate_handler;
 
 // Set by command line arguments
+static int g_fallback = 0;
 static int g_disk_no_log = 0;
 static int g_net_no_log = 0;
 static int g_pid_ctrl = 0;
@@ -108,6 +109,7 @@ static bool app_parse_command_line(int argc, char *argv[])
   int c;
   struct option long_options[] = {
     {"disk-no-log",     no_argument,       0, 'd'},
+    {"fallback",        no_argument,       0, 'f'},
     {"help",            no_argument,       0, 'h'},
     {"log",             required_argument, 0, 'l'},
     {"net-no-log",      no_argument,       0, 'n'},
@@ -124,7 +126,7 @@ static bool app_parse_command_line(int argc, char *argv[])
   }
 
   while (1) {
-    c = getopt_long(argc, argv, "dhl:npt:vV",
+    c = getopt_long(argc, argv, "dfhl:npt:vV",
 		    long_options, &option_index);
     
     // Detect the end of the options
@@ -142,6 +144,10 @@ static bool app_parse_command_line(int argc, char *argv[])
 
     case 'd':
       g_disk_no_log = 1;
+      break;
+
+    case 'f':
+      g_fallback = 1;
       break;
 
     case 'h':
@@ -196,6 +202,10 @@ static void app_report_help(const char *app_name)
 	  << "-d, --disk-no-log\n"
 	  << "    Disable data logging to local disk.\n\n"
 
+	  << "-f, --fallback\n"
+	  << "    Fallback mode with data logging disabled and minimum functionality.\n"
+	  << "    Temperature is controlled by fixed rate PWM with no feedback.\n\n"
+
 	  << "-h, --help\n"
 	  << "    Print help information and exit.\n\n"
 
@@ -224,9 +234,16 @@ static void app_report_help(const char *app_name)
 
 static void app_report_prod_info(void)
 {
-  cmon_io_put("CMON: %s-%s\n",
-	      CMON_PRODUCT_NUMBER,
-	      CMON_RSTATE);
+  if (!g_fallback) {
+    cmon_io_put("CMON: %s-%s\n",
+		CMON_PRODUCT_NUMBER,
+		CMON_RSTATE);
+  }
+  else {
+    cmon_io_put("CMON(fallback): %s-%s\n",
+		CMON_PRODUCT_NUMBER,
+		CMON_RSTATE);
+  }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -243,6 +260,7 @@ static void app_report_switches(void)
   ostringstream oss_msg;
 
   oss_msg << "Command line switches:\n";
+  oss_msg << "\tfallback        : " << (g_fallback ? "on" : "off") << "\n";
   oss_msg << "\tdisk-no-log     : " << (g_disk_no_log ? "on" : "off") << "\n";
   oss_msg << "\tlogfile         : " << g_logfile << "\n";
   oss_msg << "\tnet-no-log      : " << (g_net_no_log ? "on" : "off") << "\n";
@@ -336,7 +354,8 @@ static bool cmon_initialize(void)
   long rc;
 
   // Create the CMON core object
-  g_cmon_core = new cmon_core(g_disk_no_log == 1,
+  g_cmon_core = new cmon_core(g_fallback == 1,
+			      g_disk_no_log == 1,
                               g_net_no_log == 1,
 			      g_pid_ctrl == 1,
                               g_verbose == 1);

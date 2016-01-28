@@ -60,4 +60,8 @@ typedef enum {CMON_INTERNAL_ERROR,
 #define CMON_DEFAULT_THREAD_CPU_AFFINITY_MASK  0xffffffff // Allow all CPU's
 #define CMON_DEFAULT_THREAD_RT_PRIORITY        -1         // Use default priority
 
+// Remote control of wall outlet (230V) for radiator
+#define CMON_TX433_SYSTEM_CODE  4
+#define CMON_TX433_UNIT_CODE    3
+
 #endif // __CMON_H__

@@ -1,4 +1,16 @@
 ==================================================================
+28/1-2016 EMWHBR
+
+* R1A05
+
+* CMON
+  - R1A03
+  - New fallback mode that will be activated when to many errors.
+    Data logging disabled and with minimum functionality.
+    Temperature is controlled by fixed rate PWM with no feedback.
+  - Changed encapsulation of power switch control.
+
+==================================================================
 26/1-2016 EMWHBR
 
 * R1A04

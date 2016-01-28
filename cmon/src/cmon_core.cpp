@@ -35,6 +35,10 @@
 #define TEMP_CONTROLLER_THREAD_EXECUTE_TIMEOUT  1.0
 #define TEMP_CONTROLLER_THREAD_STOP_TIMEOUT     5.0
 
+#define FALLBACK_THREAD_START_TIMEOUT    2.0
+#define FALLBACK_THREAD_EXECUTE_TIMEOUT  2.0
+#define FALLBACK_THREAD_STOP_TIMEOUT     2.0
+
 #define CLIMATE_DATA_QUEUE_INITIAL_NR_ELEMENTS     10
 #define CONTROLLER_DATA_QUEUE_INITIAL_NR_ELEMENTS  10
 
@@ -44,7 +48,8 @@
 
 ////////////////////////////////////////////////////////////////
 
-cmon_core::cmon_core(bool disable_disk_log,
+cmon_core::cmon_core(bool fallback,
+		     bool disable_disk_log,
 		     bool disable_net_log,
 		     bool enable_temp_ctrl,
 		     bool verbose)
@@ -53,17 +58,20 @@ cmon_core::cmon_core(bool disable_disk_log,
     cmon_io_put("cmon_core::cmon_core\n");
   }
 
+  m_fallback = fallback;
   m_disable_disk_log = disable_disk_log;
   m_disable_net_log = disable_net_log;
   m_enable_temp_ctrl = enable_temp_ctrl;
   m_verbose = verbose;
 
   // Create queues
-  m_climate_data_queue =
-    new cmon_climate_data_queue(CLIMATE_DATA_QUEUE_INITIAL_NR_ELEMENTS);
-
-  m_controller_data_queue =
-    new cmon_controller_data_queue(CONTROLLER_DATA_QUEUE_INITIAL_NR_ELEMENTS);
+  if (!m_fallback) {
+    m_climate_data_queue =
+      new cmon_climate_data_queue(CLIMATE_DATA_QUEUE_INITIAL_NR_ELEMENTS);
+    
+    m_controller_data_queue =
+      new cmon_controller_data_queue(CONTROLLER_DATA_QUEUE_INITIAL_NR_ELEMENTS);
+  }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -74,29 +82,46 @@ cmon_core::~cmon_core(void)
     cmon_io_put("cmon_core::~cmon_core\n");
   }
 
-  delete m_climate_data_queue;
-  delete m_controller_data_queue;
+  if (!m_fallback) {
+    delete m_climate_data_queue;
+    delete m_controller_data_queue;
+  }
 }
 
 ////////////////////////////////////////////////////////////////
 
 void cmon_core::initialize(void)
 {
-  this->setup_climate_control();
+  if (!m_fallback) {
+    this->setup_climate_control();
+  }
+  else {
+    this->setup_fallback();
+  }
 }
 
 ////////////////////////////////////////////////////////////////
 
 void cmon_core::finalize(void)
 {
-  this->cleanup_climate_control();
+  if (!m_fallback) {
+    this->cleanup_climate_control();
+  }
+  else {
+    this->cleanup_fallback();
+  }
 }
 
 ////////////////////////////////////////////////////////////////
 
 void cmon_core::check_ok(void)
 {
-  this->check_climate_control();
+  if (!m_fallback) {
+    this->check_climate_control();
+  }
+  else {
+    this->check_fallback();
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -407,4 +432,93 @@ void cmon_core::check_climate_control(void)
   m_climate_sampler_auto = auto_ptr<cmon_climate_sampler>(climate_sampler);
   m_climate_logger_auto = auto_ptr<cmon_climate_logger>(climate_logger);
   m_temp_controller_auto = auto_ptr<cmon_temp_controller>(temp_controller);
+}
+
+////////////////////////////////////////////////////////////////
+
+void cmon_core::setup_fallback(void)
+{
+  //////////////////////////////////////////
+  // Initialize fallback thread
+  //////////////////////////////////////////
+  // Create thread object with garbage collector
+  cmon_fallback *fallback =
+    new cmon_fallback("FALLBACK",
+		      CMON_DEFAULT_THREAD_CPU_AFFINITY_MASK,
+		      CMON_DEFAULT_THREAD_RT_PRIORITY,
+		      m_verbose);
+  m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+  
+  if (m_verbose) {
+    cmon_io_put("About to initialize fallback thread\n");
+  }
+
+  // Take back ownership from auto_ptr
+  fallback = m_fallback_auto.release();
+
+  try {
+    // Initialize thread object
+    cmon_thread_initialize((thread *)fallback,
+			   FALLBACK_THREAD_START_TIMEOUT,
+			   FALLBACK_THREAD_EXECUTE_TIMEOUT);
+  }
+  catch (...) {
+    m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+    throw;
+  }
+  
+  // Give back ownership to auto_ptr
+  m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+}
+
+////////////////////////////////////////////////////////////////
+
+void cmon_core::cleanup_fallback(void)
+{
+  //////////////////////////////////////////
+  // Finalize fallback thread
+  //////////////////////////////////////////
+  if (m_verbose) {
+    cmon_io_put("About to finalize fallback thread\n");
+  }
+
+  // Shutdown thread object
+  m_fallback_auto->shutdown();
+
+  // Take back ownership from auto_ptr
+  cmon_fallback *fallback = m_fallback_auto.release();
+
+  try {
+    // Finalize thread object
+    cmon_thread_finalize((thread *)fallback,
+			 FALLBACK_THREAD_STOP_TIMEOUT);
+  }
+  catch (...) {
+    m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+    throw;
+  }
+  
+  // Give back ownership to auto_ptr
+  m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+}
+
+////////////////////////////////////////////////////////////////
+
+void cmon_core::check_fallback(void)
+{
+  //////////////////////////////
+  // Check status of threads
+  //////////////////////////////
+  // Take back ownership from auto_ptr
+  cmon_fallback *fallback = m_fallback_auto.release();
+  try {
+    cmon_thread_check_status((thread *)fallback);
+  }
+  catch (...) {
+    m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+    throw;
+  }
+
+  // Give back ownership to auto_ptr
+  m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
 }

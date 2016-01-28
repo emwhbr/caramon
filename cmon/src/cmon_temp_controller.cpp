@@ -14,10 +14,12 @@
 
 #include "cmon_temp_controller.h"
 #include "cmon_int_sensor.h"
+#include "cmon.h"
 #include "cmon_exception.h"
 #include "cmon_utility.h"
 #include "cmon_io.h"
 #include "cmon_file.h"
+#include "cmon_power_switch_rc.h"
 #include "shell_cmd.h"
 #include "timer.h"
 
@@ -30,7 +32,7 @@
 #define TEMP_PID_KD    0.00
 
 #define TEMP_PID_FILE_SET_VALUE      "/caramon/temp_pid_set_value"
-#define TEMP_PID_DEFAULT_SET_VALUE   15.0  // [deg C]
+#define TEMP_PID_DEFAULT_SET_VALUE   14.0  // [deg C]
 #define TEMP_PID_MIN_SET_VALUE        5.0  // [deg C]
 #define TEMP_PID_MAX_SET_VALUE       16.0  // [deg C]
 
@@ -39,17 +41,9 @@
 
 #define CONTROLLER_LOG_INTERVAL  TEMP_PID_PERIOD_TIME_SEC
 
-// Remote control of wall outlet (240V) for radiator
-#define TX433_CMD          "/caramon/tx433"
-#define TX433_CMD_EXIT_OK  0
-
-#define TX433_SYSTEM_CODE  "4"
-#define TX433_UNIT_CODE    "3"
-
-#define TX433_ON   "1"
-#define TX433_OFF  "0"
-
-#define TX433_MIN_CTRL_TIME  10.0  // [s] Minimum time for activation/deactivation
+#define RADIATOR_MIN_CTRL_TIME  10.0  // [s] 
+                                      // Minimum time for activation/deactivation
+                                      // of wall outlet for radiator 
 
 /////////////////////////////////////////////////////////////////////////////
 //               Public member functions
@@ -74,6 +68,11 @@ cmon_temp_controller(string thread_name,
   m_verbose = verbose;
   m_shutdown_requested = false;
 
+  m_radiator_switch = new cmon_power_switch_rc(string("RADIATOR-SWITCH"),
+					       CMON_TX433_SYSTEM_CODE,
+					       CMON_TX433_UNIT_CODE,
+					       m_verbose);
+
   m_controller_data_queue = controller_data_queue;
 
   m_temp_pid = new pid_ctrl(TEMP_PID_DEFAULT_SET_VALUE,
@@ -91,7 +90,7 @@ cmon_temp_controller::~cmon_temp_controller(void)
     cmon_io_put("%s : cmon_temp_controller::~cmon_temp_controller\n",
 		this->get_name().c_str());
   }
-
+  delete m_radiator_switch;
   delete m_temp_pid;
 }
 
@@ -340,7 +339,7 @@ void cmon_temp_controller::radiator_pulse(bool on,
   timer pulse_timer;
 
   pulse_timer.reset();
-  if (pulse_time_sec > TX433_MIN_CTRL_TIME) {
+  if (pulse_time_sec > RADIATOR_MIN_CTRL_TIME) {
     if (on) {
       this->radiator_on();
     }
@@ -372,47 +371,14 @@ void cmon_temp_controller::radiator_pulse(bool on,
 
 void cmon_temp_controller::radiator_on(void)
 {
-  const string radiator_on_cmd =
-    string(TX433_CMD) + " " +
-    string(TX433_SYSTEM_CODE) + " " +
-    string(TX433_UNIT_CODE) + " " +
-    string(TX433_ON);
-
-  this->execute_tx433_cmd(radiator_on_cmd);
+  m_radiator_switch->switch_on();
 }
 
 ////////////////////////////////////////////////////////////////
 
 void cmon_temp_controller::radiator_off(void)
 {
-  const string radiator_off_cmd =
-    string(TX433_CMD) + " " +
-    string(TX433_SYSTEM_CODE) + " " +
-    string(TX433_UNIT_CODE) + " " +
-    string(TX433_OFF);
-
-  this->execute_tx433_cmd(radiator_off_cmd);
-}
-
-////////////////////////////////////////////////////////////////
-
-void cmon_temp_controller::execute_tx433_cmd(const string cmd)
-{
-  shell_cmd sc_tx433;
-  int exit_status;
-
-  // Execute command
-  if (sc_tx433.execute(cmd, exit_status) != SHELL_CMD_SUCCESS) {
-    THROW_EXP(CMON_INTERNAL_ERROR, CMON_SHELL_OPERATION_FAILED,
-	      "Failed to execute command : %s", cmd.c_str());
-  }
-
-  // Check command exit status
-  if (exit_status != TX433_CMD_EXIT_OK) {
-    THROW_EXP(CMON_INTERNAL_ERROR, CMON_SHELL_OPERATION_FAILED,
-	      "Command failed : %s, exit status : %d",
-	      cmd.c_str(), exit_status);
-  }
+  m_radiator_switch->switch_off();
 }
 
 ////////////////////////////////////////////////////////////////
