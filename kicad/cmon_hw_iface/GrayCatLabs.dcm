@@ -1,0 +1,73 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 24LCxx
+D I2C EEPROM
+$ENDCMP
+#
+$CMP 24LCxx/OT
+D I2C EEPROM - SOT-23 package
+$ENDCMP
+#
+$CMP 5V_USB
+K POWER, PWR
+$ENDCMP
+#
+$CMP BSS84
+D -50V Vds, -130mA Id, P-Channel MOSFET, SOT-23
+K P-Channel MOSFET
+F https://www.fairchildsemi.com/datasheets/BS/BSS84.pdf
+$ENDCMP
+#
+$CMP BUxxSD5
+D 800 mA ultra low dropout regulator, fixed output version, DFN8-3x3
+$ENDCMP
+#
+$CMP CP2110-GM
+D HID USB-to-UART, QFN-24
+$ENDCMP
+#
+$CMP DMS3015SSS
+D 30V Vds, 11A Id, N-Channel MOSFET, SO-8
+K N-Channel MOSFET Logic Level
+F http://www.diodes.com/datasheets/ds32096.pdf
+$ENDCMP
+#
+$CMP LM2941SX
+D Adjustable LDO regulator - TO-263 package
+$ENDCMP
+#
+$CMP LM3671LC
+D LM3671 buck regulator, USON package
+$ENDCMP
+#
+$CMP LT1491A
+D quad rail-to-rail operational amplifier
+K quap operational op amp rail-to-rail
+$ENDCMP
+#
+$CMP LT3085DCB
+D 500mA wide input LDO regulator DFN-6
+K LDO low dropout voltage regulator DFN-6
+F http://cds.linear.com/docs/en/datasheet/3085fb.pdf
+$ENDCMP
+#
+$CMP MAX13448E
+D Full-duplex RS-485 transceiver
+K RS-485
+$ENDCMP
+#
+$CMP MCP6L04
+D quad rail-to-rail operational amplifier
+K quap operational op amp rail-to-rail
+$ENDCMP
+#
+$CMP OPAMP_QUAD
+D quad rail-to-rail operational amplifier
+K quap operational op amp rail-to-rail
+$ENDCMP
+#
+$CMP VREF
+K POWER, PWR
+$ENDCMP
+#
+#End Doc Library

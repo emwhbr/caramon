@@ -1,0 +1,540 @@
+EESchema Schematic File Version 2
+LIBS:linear-modified
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:special
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:db9-female
+LIBS:sharp-relay
+LIBS:74ac04
+LIBS:maxim
+LIBS:GrayCatLabs
+LIBS:cmon_hw_iface-cache
+EELAYER 27 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 3 4
+Title "CARAMON Hardware Interface Circuit"
+Date "20 jan 2017"
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L BC548 Q2
+U 1 1 58679036
+P 3100 1950
+F 0 "Q2" H 3100 1801 40  0000 R CNN
+F 1 "BC548" H 3100 2100 40  0000 R CNN
+F 2 "TO92" H 3000 2052 29  0000 C CNN
+F 3 "" H 3100 1950 60  0000 C CNN
+	1    3100 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L BC548 Q3
+U 1 1 58679041
+P 3050 6400
+F 0 "Q3" H 3050 6251 40  0000 R CNN
+F 1 "BC548" H 3050 6550 40  0000 R CNN
+F 2 "TO92" H 2950 6502 29  0000 C CNN
+F 3 "" H 3050 6400 60  0000 C CNN
+	1    3050 6400
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C7
+U 1 1 586790C9
+P 6650 1950
+F 0 "C7" H 6650 2050 40  0000 L CNN
+F 1 "100u" H 6656 1865 40  0000 L CNN
+F 2 "~" H 6688 1800 30  0000 C CNN
+F 3 "~" H 6650 1950 60  0000 C CNN
+	1    6650 1950
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C6
+U 1 1 586790DD
+P 6100 2500
+F 0 "C6" H 6100 2600 40  0000 L CNN
+F 1 "10n" H 6106 2415 40  0000 L CNN
+F 2 "~" H 6138 2350 30  0000 C CNN
+F 3 "~" H 6100 2500 60  0000 C CNN
+	1    6100 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C9
+U 1 1 586790E3
+P 6600 4400
+F 0 "C9" H 6600 4500 40  0000 L CNN
+F 1 "100u" H 6606 4315 40  0000 L CNN
+F 2 "~" H 6638 4250 30  0000 C CNN
+F 3 "~" H 6600 4400 60  0000 C CNN
+	1    6600 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C8
+U 1 1 586790E9
+P 6050 4900
+F 0 "C8" H 6050 5000 40  0000 L CNN
+F 1 "10n" H 6056 4815 40  0000 L CNN
+F 2 "~" H 6088 4750 30  0000 C CNN
+F 3 "~" H 6050 4900 60  0000 C CNN
+	1    6050 4900
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C10
+U 1 1 586790EF
+P 3700 3350
+F 0 "C10" H 3700 3450 40  0000 L CNN
+F 1 "10n" H 3706 3265 40  0000 L CNN
+F 2 "~" H 3738 3200 30  0000 C CNN
+F 3 "~" H 3700 3350 60  0000 C CNN
+	1    3700 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R16
+U 1 1 58679201
+P 6650 1200
+F 0 "R16" V 6730 1200 40  0000 C CNN
+F 1 "218k" V 6657 1201 40  0000 C CNN
+F 2 "~" V 6580 1200 30  0000 C CNN
+F 3 "~" H 6650 1200 30  0000 C CNN
+	1    6650 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R19
+U 1 1 58679249
+P 6600 3650
+F 0 "R19" V 6680 3650 40  0000 C CNN
+F 1 "55.8k" V 6607 3651 40  0000 C CNN
+F 2 "~" V 6530 3650 30  0000 C CNN
+F 3 "~" H 6600 3650 30  0000 C CNN
+	1    6600 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R18
+U 1 1 5867926D
+P 3150 5650
+F 0 "R18" V 3230 5650 40  0000 C CNN
+F 1 "250" V 3157 5651 40  0000 C CNN
+F 2 "~" V 3080 5650 30  0000 C CNN
+F 3 "~" H 3150 5650 30  0000 C CNN
+	1    3150 5650
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R15
+U 1 1 58679298
+P 3200 3400
+F 0 "R15" V 3280 3400 40  0000 C CNN
+F 1 "10k" V 3207 3401 40  0000 C CNN
+F 2 "~" V 3130 3400 30  0000 C CNN
+F 3 "~" H 3200 3400 30  0000 C CNN
+	1    3200 3400
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R14
+U 1 1 586792C3
+P 3200 1200
+F 0 "R14" V 3280 1200 40  0000 C CNN
+F 1 "10k" V 3207 1201 40  0000 C CNN
+F 2 "~" V 3130 1200 30  0000 C CNN
+F 3 "~" H 3200 1200 30  0000 C CNN
+	1    3200 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R17
+U 1 1 586792EF
+P 2400 6400
+F 0 "R17" V 2480 6400 40  0000 C CNN
+F 1 "1k" V 2407 6401 40  0000 C CNN
+F 2 "~" V 2330 6400 30  0000 C CNN
+F 3 "~" H 2400 6400 30  0000 C CNN
+	1    2400 6400
+	0    1    1    0   
+$EndComp
+$Comp
+L R R12
+U 1 1 58679302
+P 2450 1950
+F 0 "R12" V 2530 1950 40  0000 C CNN
+F 1 "1k" V 2457 1951 40  0000 C CNN
+F 2 "~" V 2380 1950 30  0000 C CNN
+F 3 "~" H 2450 1950 30  0000 C CNN
+	1    2450 1950
+	0    1    1    0   
+$EndComp
+$Comp
+L LM555N U3
+U 1 1 5867993C
+P 5100 1700
+F 0 "U3" H 5100 1800 70  0000 C CNN
+F 1 "LM555N" H 5100 1600 70  0000 C CNN
+F 2 "" H 5100 1700 60  0000 C CNN
+F 3 "" H 5100 1700 60  0000 C CNN
+	1    5100 1700
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 58679BAF
+P 4950 800
+F 0 "#PWR?" H 4950 750 20  0001 C CNN
+F 1 "+12V" H 4950 900 30  0000 C CNN
+F 2 "" H 4950 800 60  0000 C CNN
+F 3 "" H 4950 800 60  0000 C CNN
+	1    4950 800 
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 58679BBE
+P 3150 6900
+F 0 "#PWR?" H 3150 6900 30  0001 C CNN
+F 1 "GND" H 3150 6830 30  0001 C CNN
+F 2 "" H 3150 6900 60  0000 C CNN
+F 3 "" H 3150 6900 60  0000 C CNN
+	1    3150 6900
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 58679BCB
+P 6100 2900
+F 0 "#PWR?" H 6100 2900 30  0001 C CNN
+F 1 "GND" H 6100 2830 30  0001 C CNN
+F 2 "" H 6100 2900 60  0000 C CNN
+F 3 "" H 6100 2900 60  0000 C CNN
+	1    6100 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 58679BF3
+P 4200 1400
+F 0 "#PWR?" H 4200 1400 30  0001 C CNN
+F 1 "GND" H 4200 1330 30  0001 C CNN
+F 2 "" H 4200 1400 60  0000 C CNN
+F 3 "" H 4200 1400 60  0000 C CNN
+	1    4200 1400
+	0    1    1    0   
+$EndComp
+$Comp
+L R R13
+U 1 1 58679D4E
+P 2450 2400
+F 0 "R13" V 2530 2400 40  0000 C CNN
+F 1 "100k" V 2457 2401 40  0000 C CNN
+F 2 "~" V 2380 2400 30  0000 C CNN
+F 3 "~" H 2450 2400 30  0000 C CNN
+	1    2450 2400
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 58679D63
+P 3200 2550
+F 0 "#PWR?" H 3200 2550 30  0001 C CNN
+F 1 "GND" H 3200 2480 30  0001 C CNN
+F 2 "" H 3200 2550 60  0000 C CNN
+F 3 "" H 3200 2550 60  0000 C CNN
+	1    3200 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 58679ECC
+P 6050 5300
+F 0 "#PWR?" H 6050 5300 30  0001 C CNN
+F 1 "GND" H 6050 5230 30  0001 C CNN
+F 2 "" H 6050 5300 60  0000 C CNN
+F 3 "" H 6050 5300 60  0000 C CNN
+	1    6050 5300
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 5867A1C1
+P 3200 3000
+F 0 "#PWR?" H 3200 2950 20  0001 C CNN
+F 1 "+12V" H 3200 3100 30  0000 C CNN
+F 2 "" H 3200 3000 60  0000 C CNN
+F 3 "" H 3200 3000 60  0000 C CNN
+	1    3200 3000
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5800 2100 6100 2100
+Wire Wire Line
+	6100 2100 6100 2300
+Wire Wire Line
+	5800 1600 6650 1600
+Connection ~ 6650 1600
+Wire Wire Line
+	5800 1850 6100 1850
+Wire Wire Line
+	6100 1850 6100 1600
+Connection ~ 6100 1600
+Wire Wire Line
+	4700 1400 4200 1400
+Connection ~ 3200 1600
+Wire Wire Line
+	6650 1450 6650 1750
+Wire Wire Line
+	2900 1950 2700 1950
+Wire Wire Line
+	2700 2400 3200 2400
+Wire Wire Line
+	3200 2150 3200 2550
+Connection ~ 3200 2400
+Wire Wire Line
+	2200 2400 1900 2400
+Wire Wire Line
+	1900 2400 1900 1950
+Wire Wire Line
+	1600 1950 2200 1950
+Wire Wire Line
+	4400 1600 3200 1600
+Wire Wire Line
+	3200 1750 3200 1450
+Wire Wire Line
+	6600 3900 6600 4200
+Connection ~ 6600 4050
+Connection ~ 6050 4050
+Wire Wire Line
+	6600 4050 5750 4050
+Wire Wire Line
+	6050 4550 6050 4700
+Wire Wire Line
+	6100 2900 6100 2700
+Wire Wire Line
+	6100 2800 6650 2800
+Wire Wire Line
+	6650 2800 6650 2150
+Connection ~ 6100 2800
+Wire Wire Line
+	6050 5300 6050 5100
+Wire Wire Line
+	6600 5200 6600 4600
+Connection ~ 6050 5200
+Wire Wire Line
+	4950 800  4950 850 
+Wire Wire Line
+	6650 850  6650 950 
+Wire Wire Line
+	3200 950  3200 850 
+Connection ~ 4950 850 
+Wire Wire Line
+	5500 1350 6100 1350
+Wire Wire Line
+	6100 1350 6100 850 
+Connection ~ 6100 850 
+Wire Wire Line
+	6600 3300 6600 3400
+Connection ~ 6600 3300
+Connection ~ 6650 850 
+Wire Wire Line
+	4250 2100 4400 2100
+Connection ~ 7150 3300
+Wire Wire Line
+	4400 1850 3700 1850
+Wire Wire Line
+	3200 3150 3200 3000
+Wire Wire Line
+	3150 6200 3150 5900
+Wire Wire Line
+	3150 6900 3150 6600
+Connection ~ 4200 4550
+Wire Wire Line
+	2850 6400 2650 6400
+Text Notes 9850 6000 0    60   ~ 0
+AC 230V, to 5V PWR\n\nNC
+$Comp
+L SX12S01 K2
+U 1 1 5867A67D
+P 9250 6100
+F 0 "K2" H 9050 6300 60  0000 C CNN
+F 1 "SSR-5V-PWR" H 9250 5900 60  0000 C CNN
+F 2 "~" H 9250 6100 60  0000 C CNN
+F 3 "~" H 9250 6100 60  0000 C CNN
+F 4 "Sharp Microelectronics" H 9250 5700 60  0001 C CNN "Manufacturer"
+F 5 "SX12S01X" H 9250 5800 60  0001 C CNN "Part"
+	1    9250 6100
+	1    0    0    -1  
+$EndComp
+Text Notes 1150 1800 0    60   ~ 0
+PWR CTRL
+Text GLabel 1600 1950 0    60   Input ~ 0
+P1-16
+Wire Wire Line
+	7150 850  7150 5600
+Wire Wire Line
+	7150 5600 4200 5600
+Wire Wire Line
+	4200 5600 4200 4550
+Wire Wire Line
+	3200 850  7150 850 
+Wire Wire Line
+	4250 2100 4250 3300
+Wire Wire Line
+	3700 1850 3700 3150
+Wire Wire Line
+	4350 4050 3200 4050
+Wire Wire Line
+	3200 4050 3200 3650
+Wire Wire Line
+	3700 4050 3700 3550
+Connection ~ 3700 4050
+Wire Wire Line
+	1900 6400 2150 6400
+Connection ~ 1900 1950
+Wire Wire Line
+	3150 5400 3150 4550
+Wire Wire Line
+	3150 4550 4350 4550
+Wire Wire Line
+	4350 4300 1900 4300
+Wire Wire Line
+	1900 4300 1900 6400
+Wire Wire Line
+	8850 6050 3150 6050
+Connection ~ 3150 6050
+Text Notes 750  1150 0    60   ~ 0
+Raspberry Pi\n\nP1 GPIO (3.3V)
+$Comp
+L GND #PWR?
+U 1 1 5867B426
+P 8600 6450
+F 0 "#PWR?" H 8600 6450 30  0001 C CNN
+F 1 "GND" H 8600 6380 30  0001 C CNN
+F 2 "" H 8600 6450 60  0000 C CNN
+F 3 "" H 8600 6450 60  0000 C CNN
+	1    8600 6450
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	8600 6450 8600 6150
+Wire Wire Line
+	8600 6150 8850 6150
+Text Notes 7750 700  0    60   ~ 0
+555 Timer IC\n\nT = 1.1 x R x C
+Text Notes 7550 1600 0    60   ~ 0
+Delay pulse (U3-Q)\n\nT = 1.1 x 218k x 100u = 23.98s
+Text Notes 7550 3950 0    60   ~ 0
+Control pulse (U4-Q)\n\nT = 1.1 x 55.8k x 100u = 6.14s
+$Comp
+L LM555N U4
+U 1 1 586CE894
+P 5050 4150
+F 0 "U4" H 5050 4250 70  0000 C CNN
+F 1 "LM555N" H 5050 4050 70  0000 C CNN
+F 2 "" H 5050 4150 60  0000 C CNN
+F 3 "" H 5050 4150 60  0000 C CNN
+	1    5050 4150
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6050 5200 6600 5200
+Wire Wire Line
+	4250 3300 7150 3300
+Wire Wire Line
+	5750 4550 6050 4550
+Wire Wire Line
+	5750 4300 6050 4300
+Wire Wire Line
+	6050 4300 6050 4050
+Wire Wire Line
+	6050 3300 6050 3850
+Wire Wire Line
+	6050 3850 5450 3850
+Connection ~ 6050 3300
+$Comp
+L GND #PWR?
+U 1 1 586CEC07
+P 4150 3850
+F 0 "#PWR?" H 4150 3850 30  0001 C CNN
+F 1 "GND" H 4150 3780 30  0001 C CNN
+F 2 "" H 4150 3850 60  0000 C CNN
+F 3 "" H 4150 3850 60  0000 C CNN
+	1    4150 3850
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4650 3850 4150 3850
+Text Notes 3600 6650 0    60   ~ 0
+R12-250 = 4 x 1k in parallel\n\nTo avoid 1/4W limit on R12
+Wire Wire Line
+	5800 900  5800 850 
+Connection ~ 5800 850 
+Wire Wire Line
+	5800 1300 5800 1350
+Connection ~ 5800 1350
+Wire Wire Line
+	5800 3850 5800 3750
+Connection ~ 5800 3850
+Wire Wire Line
+	5800 3350 5800 3300
+Connection ~ 5800 3300
+$Comp
+L C C11
+U 1 1 58722E39
+P 5800 1100
+F 0 "C11" H 5800 1200 40  0000 L CNN
+F 1 "100n" H 5806 1015 40  0000 L CNN
+F 2 "~" H 5838 950 30  0000 C CNN
+F 3 "~" H 5800 1100 60  0000 C CNN
+	1    5800 1100
+	1    0    0    -1  
+$EndComp
+$Comp
+L C C10
+U 1 1 58722E55
+P 5800 3550
+F 0 "C10" H 5800 3650 40  0000 L CNN
+F 1 "100n" H 5806 3465 40  0000 L CNN
+F 2 "~" H 5838 3400 30  0000 C CNN
+F 3 "~" H 5800 3550 60  0000 C CNN
+	1    5800 3550
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC
