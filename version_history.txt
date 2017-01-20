@@ -1,7 +1,20 @@
 ==================================================================
+20/1-2017 EMWHBR
+
+* R1A
+
+* Baseline for further development.
+
+* CMON
+  - R1A
+  - Updated revision (R-state) information.
+
+==================================================================
 30/1-2016 EMWHBR
 
 * R1A06
+
+* SD card image: 20160130_caramon_r1a06_raspbian.img.bz2
 
 * CMON
   - R1A04
