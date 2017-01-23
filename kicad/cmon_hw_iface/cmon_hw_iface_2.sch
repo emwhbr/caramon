@@ -35,14 +35,13 @@ LIBS:sharp-relay
 LIBS:74ac04
 LIBS:maxim
 LIBS:GrayCatLabs
-LIBS:cmon_hw_iface-cache
 EELAYER 27 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 3 4
+Sheet 3 5
 Title "CARAMON Hardware Interface Circuit"
-Date "20 jan 2017"
+Date "23 jan 2017"
 Rev ""
 Comp ""
 Comment1 ""
@@ -413,8 +412,6 @@ Wire Wire Line
 Wire Wire Line
 	4200 5600 4200 4550
 Wire Wire Line
-	3200 850  7150 850 
-Wire Wire Line
 	4250 2100 4250 3300
 Wire Wire Line
 	3700 1850 3700 3150
@@ -476,8 +473,6 @@ $EndComp
 Wire Wire Line
 	6050 5200 6600 5200
 Wire Wire Line
-	4250 3300 7150 3300
-Wire Wire Line
 	5750 4550 6050 4550
 Wire Wire Line
 	5750 4300 6050 4300
@@ -504,37 +499,49 @@ Wire Wire Line
 Text Notes 3600 6650 0    60   ~ 0
 R12-250 = 4 x 1k in parallel\n\nTo avoid 1/4W limit on R12
 Wire Wire Line
-	5800 900  5800 850 
-Connection ~ 5800 850 
-Wire Wire Line
-	5800 1300 5800 1350
+	5800 1100 5800 1350
 Connection ~ 5800 1350
 Wire Wire Line
-	5800 3850 5800 3750
+	5800 3550 5800 3850
 Connection ~ 5800 3850
-Wire Wire Line
-	5800 3350 5800 3300
-Connection ~ 5800 3300
 $Comp
 L C C11
 U 1 1 58722E39
-P 5800 1100
-F 0 "C11" H 5800 1200 40  0000 L CNN
-F 1 "100n" H 5806 1015 40  0000 L CNN
-F 2 "~" H 5838 950 30  0000 C CNN
-F 3 "~" H 5800 1100 60  0000 C CNN
-	1    5800 1100
-	1    0    0    -1  
+P 5100 1100
+F 0 "C11" H 5100 1200 40  0000 L CNN
+F 1 "100n" H 5106 1015 40  0000 L CNN
+F 2 "~" H 5138 950 30  0000 C CNN
+F 3 "~" H 5100 1100 60  0000 C CNN
+	1    5100 1100
+	0    -1   -1   0   
 $EndComp
 $Comp
 L C C10
 U 1 1 58722E55
-P 5800 3550
-F 0 "C10" H 5800 3650 40  0000 L CNN
-F 1 "100n" H 5806 3465 40  0000 L CNN
-F 2 "~" H 5838 3400 30  0000 C CNN
-F 3 "~" H 5800 3550 60  0000 C CNN
-	1    5800 3550
-	1    0    0    -1  
+P 5050 3550
+F 0 "C10" H 5050 3650 40  0000 L CNN
+F 1 "100n" H 5056 3465 40  0000 L CNN
+F 2 "~" H 5088 3400 30  0000 C CNN
+F 3 "~" H 5050 3550 60  0000 C CNN
+	1    5050 3550
+	0    -1   -1   0   
 $EndComp
+Wire Wire Line
+	5800 1100 5300 1100
+Wire Wire Line
+	4400 1400 4400 1100
+Wire Wire Line
+	4400 1100 4900 1100
+Connection ~ 4400 1400
+Wire Wire Line
+	3200 850  7150 850 
+Wire Wire Line
+	4350 3850 4350 3550
+Wire Wire Line
+	4350 3550 4850 3550
+Connection ~ 4350 3850
+Wire Wire Line
+	5250 3550 5800 3550
+Wire Wire Line
+	4250 3300 7150 3300
 $EndSCHEMATC

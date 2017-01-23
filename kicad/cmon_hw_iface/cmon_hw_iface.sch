@@ -35,14 +35,13 @@ LIBS:sharp-relay
 LIBS:74ac04
 LIBS:maxim
 LIBS:GrayCatLabs
-LIBS:cmon_hw_iface-cache
 EELAYER 27 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 4
+Sheet 1 5
 Title "CARAMON Hardware Interface Circuit"
-Date "20 jan 2017"
+Date "23 jan 2017"
 Rev "PA1"
 Comp "Bonden i Nol AB"
 Comment1 ""
@@ -63,15 +62,23 @@ F0 "CMON HW IFACE 2" 50
 F1 "cmon_hw_iface_2.sch" 50
 $EndSheet
 $Sheet
-S 6100 4500 3000 1800
+S 1700 4650 3000 1800
 U 58691251
 F0 "CMON HW IFACE 3" 50
 F1 "cmon_hw_iface_3.sch" 50
 $EndSheet
-Text Notes 8750 4350 0    60   ~ 0
+Text Notes 4350 4500 0    60   ~ 0
 Sensors
 Text Notes 8250 1350 0    60   ~ 0
 5V Power control
 Text Notes 3400 1350 0    60   ~ 0
 LED, RS232, Rad control
+Text Notes 8550 4500 0    60   ~ 0
+Watchdog
+$Sheet
+S 6100 4650 2950 1800
+U 588692E5
+F0 "CMON HW IFACE 4" 50
+F1 "cmon_hw_iface_4.sch" 50
+$EndSheet
 $EndSCHEMATC
