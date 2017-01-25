@@ -41,7 +41,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 2 5
 Title "CARAMON Hardware Interface Circuit"
-Date "23 jan 2017"
+Date "25 jan 2017"
 Rev ""
 Comp ""
 Comment1 ""

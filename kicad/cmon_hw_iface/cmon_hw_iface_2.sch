@@ -41,7 +41,7 @@ $Descr A4 11693 8268
 encoding utf-8
 Sheet 3 5
 Title "CARAMON Hardware Interface Circuit"
-Date "23 jan 2017"
+Date "25 jan 2017"
 Rev ""
 Comp ""
 Comment1 ""
@@ -401,10 +401,10 @@ F 5 "SX12S01X" H 9250 5800 60  0001 C CNN "Part"
 	1    9250 6100
 	1    0    0    -1  
 $EndComp
-Text Notes 1150 1800 0    60   ~ 0
-PWR CTRL
+Text Notes 750  1600 0    60   ~ 0
+From output stage of\n\nwatchdog circuit
 Text GLabel 1600 1950 0    60   Input ~ 0
-P1-16
+5V-PWR-CTRL
 Wire Wire Line
 	7150 850  7150 5600
 Wire Wire Line
@@ -436,8 +436,6 @@ Wire Wire Line
 Wire Wire Line
 	8850 6050 3150 6050
 Connection ~ 3150 6050
-Text Notes 750  1150 0    60   ~ 0
-Raspberry Pi\n\nP1 GPIO (3.3V)
 $Comp
 L GND #PWR?
 U 1 1 5867B426
