@@ -35,13 +35,14 @@ LIBS:sharp-relay
 LIBS:74ac04
 LIBS:maxim
 LIBS:GrayCatLabs
+LIBS:cmon_hw_iface-cache
 EELAYER 27 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
 Sheet 5 5
 Title ""
-Date "25 jan 2017"
+Date "28 jan 2017"
 Rev ""
 Comp ""
 Comment1 ""
@@ -109,7 +110,7 @@ L R R26
 U 1 1 588694E1
 P 2500 5250
 F 0 "R26" V 2580 5250 40  0000 C CNN
-F 1 "1k" V 2507 5251 40  0000 C CNN
+F 1 "1.2k" V 2507 5251 40  0000 C CNN
 F 2 "~" V 2430 5250 30  0000 C CNN
 F 3 "~" H 2500 5250 30  0000 C CNN
 	1    2500 5250
@@ -151,12 +152,12 @@ $EndComp
 $Comp
 L R R27
 U 1 1 588694FF
-P 2500 5700
-F 0 "R27" V 2580 5700 40  0000 C CNN
-F 1 "100k" V 2507 5701 40  0000 C CNN
-F 2 "~" V 2430 5700 30  0000 C CNN
-F 3 "~" H 2500 5700 30  0000 C CNN
-	1    2500 5700
+P 2500 5550
+F 0 "R27" V 2580 5550 40  0000 C CNN
+F 1 "100k" V 2507 5551 40  0000 C CNN
+F 2 "~" V 2430 5550 30  0000 C CNN
+F 3 "~" H 2500 5550 30  0000 C CNN
+	1    2500 5550
 	0    1    1    0   
 $EndComp
 Wire Wire Line
@@ -164,29 +165,17 @@ Wire Wire Line
 Wire Wire Line
 	7400 5400 7400 5600
 Wire Wire Line
-	6000 4700 5500 4700
+	5500 4700 6000 4700
 Connection ~ 3250 4900
 Wire Wire Line
 	2950 5250 2750 5250
 Wire Wire Line
-	2750 5700 3250 5700
+	3250 4750 3250 5050
 Wire Wire Line
-	3250 5450 3250 5850
-Connection ~ 3250 5700
-Wire Wire Line
-	2250 5700 1950 5700
-Wire Wire Line
-	1950 5700 1950 5250
-Wire Wire Line
-	1650 5250 2250 5250
-Wire Wire Line
-	3250 5050 3250 4750
-Wire Wire Line
-	7400 6200 7400 6000
+	7400 6000 7400 6200
 Connection ~ 7400 6100
 Wire Wire Line
 	6800 4650 7400 4650
-Connection ~ 1950 5250
 Wire Wire Line
 	7100 4400 7100 4650
 Connection ~ 7100 4650
@@ -213,7 +202,7 @@ L C C16
 U 1 1 5888D8BB
 P 3650 4900
 F 0 "C16" H 3650 5000 40  0000 L CNN
-F 1 "C" H 3656 4815 40  0000 L CNN
+F 1 "100n" H 3656 4815 40  0000 L CNN
 F 2 "~" H 3688 4750 30  0000 C CNN
 F 3 "~" H 3650 4900 60  0000 C CNN
 	1    3650 4900
@@ -244,12 +233,12 @@ $EndComp
 $Comp
 L GND #PWR?
 U 1 1 5888D9D4
-P 3250 5850
-F 0 "#PWR?" H 3250 5850 30  0001 C CNN
-F 1 "GND" H 3250 5780 30  0001 C CNN
-F 2 "" H 3250 5850 60  0000 C CNN
-F 3 "" H 3250 5850 60  0000 C CNN
-	1    3250 5850
+P 3250 5650
+F 0 "#PWR?" H 3250 5650 30  0001 C CNN
+F 1 "GND" H 3250 5580 30  0001 C CNN
+F 2 "" H 3250 5650 60  0000 C CNN
+F 3 "" H 3250 5650 60  0000 C CNN
+	1    3250 5650
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
@@ -275,7 +264,7 @@ Wire Wire Line
 	4500 4250 4500 4100
 Connection ~ 4500 4100
 Wire Wire Line
-	5100 5400 5700 5400
+	4100 5400 5700 5400
 Wire Wire Line
 	5100 3800 5100 5400
 Connection ~ 5100 4100
@@ -330,10 +319,10 @@ F 3 "~" H 5000 7150 60  0000 C CNN
 	1    0    0    1   
 $EndComp
 $Comp
-L BC548 Q6
+L BC548 Q7
 U 1 1 5888DE60
 P 6300 6750
-F 0 "Q6" H 6300 6601 40  0000 R CNN
+F 0 "Q7" H 6300 6601 40  0000 R CNN
 F 1 "BC548" H 6300 6900 40  0000 R CNN
 F 2 "TO92" H 6200 6852 29  0000 C CNN
 F 3 "" H 6300 6750 60  0000 C CNN
@@ -352,11 +341,11 @@ F 3 "~" H 8800 2300 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L R R?
+L R R34
 U 1 1 5888DE6C
 P 5650 6750
-F 0 "R?" V 5730 6750 40  0000 C CNN
-F 1 "1k" V 5657 6751 40  0000 C CNN
+F 0 "R34" V 5730 6750 40  0000 C CNN
+F 1 "1.2k" V 5657 6751 40  0000 C CNN
 F 2 "~" V 5580 6750 30  0000 C CNN
 F 3 "~" H 5650 6750 30  0000 C CNN
 	1    5650 6750
@@ -450,9 +439,9 @@ Wire Wire Line
 Wire Wire Line
 	7400 2350 7400 2900
 Wire Wire Line
-	6000 1650 5500 1650
+	5500 1650 6000 1650
 Wire Wire Line
-	7400 3500 7400 3300
+	7400 3300 7400 3500
 Connection ~ 7400 3400
 Wire Wire Line
 	6800 1600 7400 1600
@@ -519,28 +508,6 @@ Wire Wire Line
 Wire Wire Line
 	7650 2100 7650 2750
 Connection ~ 7650 2750
-$Comp
-L +5V #PWR?
-U 1 1 5888E53D
-P 5100 3800
-F 0 "#PWR?" H 5100 3890 20  0001 C CNN
-F 1 "+5V" H 5100 3890 30  0000 C CNN
-F 2 "" H 5100 3800 60  0000 C CNN
-F 3 "" H 5100 3800 60  0000 C CNN
-	1    5100 3800
-	1    0    0    -1  
-$EndComp
-$Comp
-L +5V #PWR?
-U 1 1 5888E5A3
-P 5100 750
-F 0 "#PWR?" H 5100 840 20  0001 C CNN
-F 1 "+5V" H 5100 840 30  0000 C CNN
-F 2 "" H 5100 750 60  0000 C CNN
-F 3 "" H 5100 750 60  0000 C CNN
-	1    5100 750 
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	6400 6550 6400 6400
 Wire Wire Line
@@ -611,11 +578,11 @@ Text Notes 1250 5100 0    60   ~ 0
 WDI
 Text GLabel 1650 5250 0    60   Input ~ 0
 P1-16
-Text Notes 850  6100 0    60   ~ 0
+Text Notes 600  5750 0    60   ~ 0
 Raspberry Pi\n\nP1 GPIO (3.3V)
-Text Notes 1250 7000 0    60   ~ 0
-WDE_N
-Text GLabel 1650 7150 0    60   Input ~ 0
+Text Notes 1250 6700 0    60   ~ 0
+WDE
+Text GLabel 1650 6850 0    60   Input ~ 0
 P1-18
 Wire Wire Line
 	4500 2900 2600 2900
@@ -624,7 +591,7 @@ Wire Wire Line
 Wire Wire Line
 	2600 2300 2800 2300
 Wire Wire Line
-	3800 2100 3800 1700
+	3800 1700 3800 2100
 Text Notes 1350 1550 0    60   ~ 0
 To input stage of\n\n5V power control circuit
 Text GLabel 2200 1900 0    60   Input ~ 0
@@ -632,41 +599,131 @@ Text GLabel 2200 1900 0    60   Input ~ 0
 Wire Wire Line
 	3800 1900 2200 1900
 Connection ~ 3800 1900
-Wire Wire Line
-	4800 7150 1650 7150
 $Comp
-L +3.3V #PWR?
-U 1 1 5888EF0A
-P 2000 6350
-F 0 "#PWR?" H 2000 6310 30  0001 C CNN
-F 1 "+3.3V" H 2000 6460 30  0000 C CNN
-F 2 "" H 2000 6350 60  0000 C CNN
-F 3 "" H 2000 6350 60  0000 C CNN
-	1    2000 6350
-	1    0    0    -1  
-$EndComp
-$Comp
-L R R31
+L R R32
 U 1 1 5888EF17
-P 2000 6750
-F 0 "R31" V 2080 6750 40  0000 C CNN
-F 1 "100k" V 2007 6751 40  0000 C CNN
-F 2 "~" V 1930 6750 30  0000 C CNN
-F 3 "~" H 2000 6750 30  0000 C CNN
-	1    2000 6750
-	1    0    0    -1  
+P 2450 7150
+F 0 "R32" V 2530 7150 40  0000 C CNN
+F 1 "100k" V 2457 7151 40  0000 C CNN
+F 2 "~" V 2380 7150 30  0000 C CNN
+F 3 "~" H 2450 7150 30  0000 C CNN
+	1    2450 7150
+	0    -1   1    0   
 $EndComp
-Wire Wire Line
-	2000 6350 2000 6500
-Wire Wire Line
-	2000 7000 2000 7150
-Connection ~ 2000 7150
-Text Notes 1650 7450 0    60   ~ 0
-Set low to enable watchdog
+Text Notes 1250 6400 0    60   ~ 0
+High to enable watchdog
 Text Notes 4700 5950 0    60   ~ 0
 Tout (high) = 1.1 x R30 x C18\n\nTout (high) = 1.1 x 10 x 10 = 110ms
 Text Notes 650  4800 0    60   ~ 0
 Keep Tperiod < 0.9s to avoid watchdog timeout
 Text Notes 8200 900  0    60   ~ 0
 Tcharge = 0.693 x (R23 + R24) x C14   (Watchdog timeout)\n\nTcharge = 0.693 x (56 + 4.7) x 22 = 925ms\n\n\nTdischarge = 0.693 x R24 x C14\n\nTdischarge = 0.693 x 4.7 x 22 = 72ms
+$Comp
+L +12V #PWR?
+U 1 1 588C9751
+P 5100 750
+F 0 "#PWR?" H 5100 700 20  0001 C CNN
+F 1 "+12V" H 5100 850 30  0000 C CNN
+F 2 "" H 5100 750 60  0000 C CNN
+F 3 "" H 5100 750 60  0000 C CNN
+	1    5100 750 
+	1    0    0    -1  
+$EndComp
+$Comp
+L +12V #PWR?
+U 1 1 588C975E
+P 5100 3800
+F 0 "#PWR?" H 5100 3750 20  0001 C CNN
+F 1 "+12V" H 5100 3900 30  0000 C CNN
+F 2 "" H 5100 3800 60  0000 C CNN
+F 3 "" H 5100 3800 60  0000 C CNN
+	1    5100 3800
+	1    0    0    -1  
+$EndComp
+$Comp
+L BC548 Q6
+U 1 1 588C9769
+P 3150 6850
+F 0 "Q6" H 3150 6701 40  0000 R CNN
+F 1 "BC548" H 3150 7000 40  0000 R CNN
+F 2 "TO92" H 3050 6952 29  0000 C CNN
+F 3 "" H 3150 6850 60  0000 C CNN
+	1    3150 6850
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R31
+U 1 1 588C9791
+P 2450 6850
+F 0 "R31" V 2530 6850 40  0000 C CNN
+F 1 "1.2k" V 2457 6851 40  0000 C CNN
+F 2 "~" V 2380 6850 30  0000 C CNN
+F 3 "~" H 2450 6850 30  0000 C CNN
+	1    2450 6850
+	0    1    1    0   
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 588C9798
+P 3250 7250
+F 0 "#PWR?" H 3250 7250 30  0001 C CNN
+F 1 "GND" H 3250 7180 30  0001 C CNN
+F 2 "" H 3250 7250 60  0000 C CNN
+F 3 "" H 3250 7250 60  0000 C CNN
+	1    3250 7250
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R33
+U 1 1 588C9911
+P 3250 6200
+F 0 "R33" V 3330 6200 40  0000 C CNN
+F 1 "10k" V 3257 6201 40  0000 C CNN
+F 2 "~" V 3180 6200 30  0000 C CNN
+F 3 "~" H 3250 6200 30  0000 C CNN
+	1    3250 6200
+	1    0    0    -1  
+$EndComp
+Connection ~ 5100 5400
+Wire Wire Line
+	2700 6850 2950 6850
+Wire Wire Line
+	4100 6550 4100 7150
+Wire Wire Line
+	4100 7150 4800 7150
+Wire Wire Line
+	2200 6850 1650 6850
+Wire Wire Line
+	2200 7150 2000 7150
+Wire Wire Line
+	2000 7150 2000 6850
+Connection ~ 2000 6850
+Wire Wire Line
+	1650 5250 2250 5250
+Wire Wire Line
+	2250 5550 2000 5550
+Wire Wire Line
+	2000 5550 2000 5250
+Connection ~ 2000 5250
+Wire Wire Line
+	2750 5550 3250 5550
+Wire Wire Line
+	3250 5450 3250 5650
+Connection ~ 3250 5550
+Wire Wire Line
+	3250 7050 3250 7250
+Wire Wire Line
+	3250 7150 2700 7150
+Connection ~ 3250 7150
+Wire Wire Line
+	3250 5950 3250 5850
+Wire Wire Line
+	3250 5850 4100 5850
+Wire Wire Line
+	4100 5850 4100 5400
+Wire Wire Line
+	3250 6450 3250 6650
+Wire Wire Line
+	3250 6550 4100 6550
+Connection ~ 3250 6550
 $EndSCHEMATC
