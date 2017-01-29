@@ -20,7 +20,21 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of macros
 /////////////////////////////////////////////////////////////////////////////
-#define PIN_WDI  GPIO_P1_16  // This pin keeps the WDT alive
+#define PIN_WDI  GPIO_P1_16  // BCM GPIO 23
+                             // This pin keeps the WDT alive
+
+#define PIN_WDE  GPIO_P1_18  // BCM GPIO 24
+                             // This pin enables the WDT
+
+#define WDI_HIGH_US  100     // Time[us] WDI pulse high
+                             // All values below was long enough to create a
+                             // falling edge on input stage of the WDT circuit.
+                             // Set    Real (measured with oscilloscope)
+                             //   0    75
+                             //   1    75
+                             // 100   250
+                             // 300   380
+                             // 500   580
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of types
@@ -47,9 +61,34 @@ static void wdt_initialize(void)
     throw 1;
   }
 
+  // WDE
+  rc = g_gpio.set_function(PIN_WDE, GPIO_FUNC_OUT);
+  if (rc != GPIO_SUCCESS) {
+    printf("*** GPIO set_function failed for WDE, pin(%d), rc=%ld\n",
+	   PIN_WDE, rc);
+    throw 1;
+  }
+  rc = g_gpio.write(PIN_WDE, 0); // Disable WDT.
+                                 // Already pulled down by resistor at this stage.
+                                 // But better safe than sorry.
+  if (rc != GPIO_SUCCESS) {
+    printf("*** GPIO write (low) failed for WDE, pin(%d), rc=%ld\n",
+	   PIN_WDE, rc);
+    throw 1;
+  }
+
+  // WDI
   rc = g_gpio.set_function(PIN_WDI, GPIO_FUNC_OUT);
   if (rc != GPIO_SUCCESS) {
     printf("*** GPIO set_function failed for WDI, pin(%d), rc=%ld\n",
+	   PIN_WDI, rc);
+    throw 1;
+  }
+  rc = g_gpio.write(PIN_WDI, 0); // Make sure function 'wdt_keep_alive' starts from low.
+                                 // Already pulled down by resistor at this stage.
+                                 // But better safe than sorry.
+  if (rc != GPIO_SUCCESS) {
+    printf("*** GPIO write (low) failed for WDI, pin(%d), rc=%ld\n",
 	   PIN_WDI, rc);
     throw 1;
   }
@@ -62,14 +101,21 @@ static void wdt_keep_alive(void)
   long rc;
 
   // A minimal pulse shall be enough.
-  // The input stage of the WDT curcuit reacts on a falling edge.
+  // The input stage of the WDT circuit reacts on a falling edge.
 
+  // High
   rc = g_gpio.write(PIN_WDI, 1);
   if (rc != GPIO_SUCCESS) {
     printf("*** GPIO write (high) failed for WDI, pin(%d), rc=%ld\n",
 	   PIN_WDI, rc);
     throw 1;
   }
+  if ( delay(WDI_HIGH_US / 1000000.0) != DELAY_SUCCESS ) {
+    printf("*** delay failed\n");
+    throw 1;
+  }
+  
+  // Low
   rc = g_gpio.write(PIN_WDI, 0);
   if (rc != GPIO_SUCCESS) {
     printf("*** GPIO write (low) failed for WDI, pin(%d), rc=%ld\n",
@@ -82,6 +128,8 @@ static void wdt_keep_alive(void)
 
 static void wdt_loop(int ptime_ms)
 {
+  long rc;
+
   const clockid_t the_clock = get_clock_id();
   struct timespec t1;
   struct timespec t2;
@@ -91,6 +139,14 @@ static void wdt_loop(int ptime_ms)
   wdt_initialize();                             // Initialize watchdog timer
   if (clock_gettime(the_clock, &t1) == -1) {    // Get start time 
     printf("*** clock_gettime failed\n");
+    throw 1;
+  }
+
+  // Enable the watchdog timer
+  rc = g_gpio.write(PIN_WDE, 1);
+  if (rc != GPIO_SUCCESS) {
+    printf("*** GPIO write (high) failed for WDE, pin(%d), rc=%ld\n",
+	   PIN_WDE, rc);
     throw 1;
   }
 
