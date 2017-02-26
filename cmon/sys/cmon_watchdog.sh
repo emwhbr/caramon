@@ -13,7 +13,7 @@
 CMON_DIR="/caramon"
 
 CMON_WATCHDOG_LOG=${CMON_DIR}/cmon_watchdog.log
-CMON_TERMINATE_ERROR_FILE=${CMON_DIR}/cmon_terminate_error_cnt
+CMON_TERMINATE_ERROR_FILE=${CMON_DIR}/cmon_terminate_sw_wd_error_cnt
 
 CMON_UTIL="cmon_util.sh"
 CMON_EXE="cmon_rel.arm"
@@ -24,8 +24,16 @@ MAX_TERMINATE_ERRORS=10
 function get_terminate_errors()
 ################################################################
 {
-    errors=0
-    read errors < ${CMON_TERMINATE_ERROR_FILE}
+    local errors
+
+    # If no error file exists, all is well
+    if [ ! -f ${CMON_TERMINATE_ERROR_FILE} ]; then
+	echo 0 > ${CMON_TERMINATE_ERROR_FILE}
+	errors=0
+    else
+	read errors <  ${CMON_TERMINATE_ERROR_FILE}
+    fi
+
     echo ${errors}
     return 0
 }
@@ -34,6 +42,8 @@ function get_terminate_errors()
 function pid_of_cmon()
 ################################################################
 {
+    local PID
+
     PID=`ps -e | grep ${CMON_EXE} | awk '{print $1}'`
     if [ -z "$PID" ]; then
 	echo ""

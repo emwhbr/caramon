@@ -15,16 +15,18 @@
 #include "cmon_exception.h"
 #include "cmon_utility.h"
 #include "cmon_led.h"
-#include "cmon_power_switch_rc.h"
+#include "cmon_power_switch_ssr.h"
 #include "timer.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definitions of macros
 /////////////////////////////////////////////////////////////////////////////
-#define TEMP_PWM_PERIOD_TIME_SEC  600.0 // [s]
-#define TEMP_PWM_DUTY              25.0 // [%]
+#define TEMP_PWM_PERIOD_TIME_SEC  60.0 // [s]
+#define TEMP_PWM_DUTY             25.0 // [%]
 
 #define FALLBACK_LED_FREQUENCY  2.0 // [Hz]
+
+#define PIN_RADIATOR_CTRL  GPIO_P1_15  // Controls radiator via SSR K1
 
 /////////////////////////////////////////////////////////////////////////////
 //               Public member functions
@@ -49,10 +51,9 @@ cmon_fallback(string thread_name,
   m_fallback_led_active = false;
   m_shutdown_requested = false;
 
-  m_radiator_switch = new cmon_power_switch_rc(string("RADIATOR-SWITCH"),
-					       CMON_TX433_SYSTEM_CODE,
-					       CMON_TX433_UNIT_CODE,
-					       m_verbose);
+  m_radiator_switch = new cmon_power_switch_ssr(string("RADIATOR-CTRL"),
+						PIN_RADIATOR_CTRL,
+						m_verbose);  
 }
 
 ////////////////////////////////////////////////////////////////
@@ -195,6 +196,13 @@ long cmon_fallback::execute(void *arg)
 void cmon_fallback::initialize_fallback(void)
 {
   cmon_led(CMON_LED_SYSFAIL, true);  // Turn status LED on
+
+  // Initialize power switch (Only necessary for SSR controlled power switch)
+  cmon_power_switch_ssr *ssr_switch = dynamic_cast<cmon_power_switch_ssr*>(m_radiator_switch);
+  if (ssr_switch) {
+    ssr_switch->initialize();
+  }
+  this->radiator_off(); // Turn off radiator
 }
 
 ////////////////////////////////////////////////////////////////
@@ -202,6 +210,14 @@ void cmon_fallback::initialize_fallback(void)
 void cmon_fallback::finalize_fallback(void)
 {
   cmon_led(CMON_LED_SYSFAIL, false);  // Turn status LED off
+
+  this->radiator_off(); // Turn off radiator
+
+  // Finalize power switch (Only necessary for SSR controlled power switch)
+  cmon_power_switch_ssr *ssr_switch = dynamic_cast<cmon_power_switch_ssr*>(m_radiator_switch);
+  if (ssr_switch) {
+    ssr_switch->finalize();
+  }
 }
 
 ////////////////////////////////////////////////////////////////

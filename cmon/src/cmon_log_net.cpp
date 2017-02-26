@@ -72,7 +72,7 @@ void cmon_log_net::log_data(const CMON_CLIMATE_DATA *climate_data,
   // Channel is updated with the following command syntax:
   /*
    * curl --fail --silent \
-   *      --data "key=<WRITE_KEY>&field1=<value1>&field2=<value2>&field3=<value3>&field4=<value4>&field5=<value5>" \
+   *      --data "key=<WRITE_KEY>&field1=<value1>&field2=<value2>&field3=<value3>&field4=<value4>&field5=<value5>&field6=<value6>" \
    *      https://api.thingspeak.com/update
   */
 
@@ -95,21 +95,32 @@ void cmon_log_net::log_data(const CMON_CLIMATE_DATA *climate_data,
     curl_cmd += ("&field2=" + ossMsg.str());
   }
 
-  // External temperature (Field 3)
-  if (climate_data->external_temperature.valid) {
+  // External temperature 1 (Field 3)
+  if (climate_data->external_temperature_1.valid) {
     ossMsg.str("");
-    ossMsg << fixed << setprecision(3) << climate_data->external_temperature.mean;
+    ossMsg << fixed << setprecision(3) << climate_data->external_temperature_1.mean;
     curl_cmd += ("&field3=" + ossMsg.str());
   }
 
-  // Controller PID (Field 4=duty, Field 5=set value)
-  if (controller_data->temp_controller.valid) {
+  // External temperature 2 (Field 4)
+  if (climate_data->external_temperature_2.valid) {
     ossMsg.str("");
-    ossMsg << fixed << setprecision(2) << controller_data->temp_controller.duty;
+    ossMsg << fixed << setprecision(3) << climate_data->external_temperature_2.mean;
     curl_cmd += ("&field4=" + ossMsg.str());
+  }
+
+  // Controller PID - duty (Field 5)
+  if (controller_data->duty.valid) {
     ossMsg.str("");
-    ossMsg << fixed << setprecision(3) << controller_data->temp_controller.set_value;
+    ossMsg << fixed << setprecision(2) << controller_data->duty.mean;
     curl_cmd += ("&field5=" + ossMsg.str());
+  }
+
+  // Controller PID - set value (Field 6)
+  if (controller_data->set_value.valid) {
+    ossMsg.str("");
+    ossMsg << fixed << setprecision(3) << controller_data->set_value.mean;
+    curl_cmd += ("&field6=" + ossMsg.str());
   }
 
   curl_cmd += "\" ";

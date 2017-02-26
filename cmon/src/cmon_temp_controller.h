@@ -15,6 +15,7 @@
 #include "cmon_controller_data_queue.h"
 #include "cmon_power_switch.h"
 #include "thread.h"
+#include "item_stats.h"
 #include "pid_ctrl.h"
 
 using namespace std;
@@ -26,6 +27,10 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //               Class support types
 /////////////////////////////////////////////////////////////////////////////
+typedef struct {
+  item_stats<float> duty_stats;
+  item_stats<float> set_value_stats;
+} CMON_CONTROLLER;
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of classes
@@ -60,6 +65,14 @@ class cmon_temp_controller : public thread {
   // Data queue      Internal thread    External thread
   cmon_controller_data_queue *m_controller_data_queue;
 
+  // Controller
+  CMON_CONTROLLER m_controller;
+
+  // Internal climate
+  int  m_previous_temp;
+  int  m_internal_climate_sensor_error_cnt;
+  bool m_internal_climate_sensor_permanent_fault;
+
   // Temperature PID controller
   pid_ctrl *m_temp_pid;
 
@@ -69,6 +82,9 @@ class cmon_temp_controller : public thread {
 
   // Support functions for the internal thread
   void check_temp_controller_set_value(void);
+
+  void sample_internal_temperature(float &temperature,
+				   bool &sensor_error);
 
   void radiator_pulse(bool on,
 		      double pulse_time_sec);

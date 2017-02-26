@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 #
 # rc.local
 #
@@ -11,28 +11,51 @@
 #
 # By default this script does nothing.
 
-# EMWHBR 2015-12-14
 # Playing with output from this script
-exec 2> /tmp/rc.local.log  # send stderr from rc.local to a log file
-exec 1>&2                  # send stdout to the same log file
+#exec 2> /tmp/rc.local.log  # send stderr from rc.local to a log file
+#exec 1>&2                  # send stdout to the same log file
 
-# Print the IP address
-_IP=$(hostname -I) || true
-if [ "$_IP" ]; then
-  printf "My IP address is %s\n" "$_IP"
-fi
-
-# EMWHBR 2015-12-12
 # Register I2C RTC DS3231 and update system time from the device
 echo ds3231 0x68 >/sys/bus/i2c/devices/i2c-1/new_device
 sleep 0.5     # Allow registration to complete
 hwclock -s    # Update system time...
+if [ $? -ne 0 ]; then
+    printf "*** ERROR: failed hwclock -s, 1/2\n"
+fi
 sleep 1.0     # ... wait a bit...
 hwclock -s    # ....and do it again
+if [ $? -ne 0 ]; then
+    printf "*** ERROR: failed hwclock -s, 2/2\n"
+fi
+hwclock -r
+if [ $? -ne 0 ]; then
+    printf "*** ERROR: failed hwclock -r\n"
+fi
+date
 
-hwclock -r && date  # Check result in the log file
+# Wait for network
+cnt=1
+max_cnt=20
+rpi_ip=""
+while [ $cnt -le $max_cnt ]
+do
+    echo "Wait for network ${cnt}/${max_cnt}"
+    rpi_ip=$(hostname -I) || true
+    if [ "$rpi_ip" ]; then
+	break
+    fi
 
-# EMWHBR 2016-01-01
+    sleep 1.0
+    cnt=$(( $cnt + 1 ))
+done
+
+# Print the IP address
+if [ "$rpi_ip" ]; then
+    printf "My IP address is %s\n" "$rpi_ip"
+else
+    printf "My IP address is UNKNOWN\n"
+fi
+
 # Start CMON
 /caramon/cmon_util.sh start
 

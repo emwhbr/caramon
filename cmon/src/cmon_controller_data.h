@@ -29,13 +29,15 @@ typedef struct {
 
 typedef struct {
   bool  valid;
-  float duty;
-  float set_value;
+  float min;
+  float max;
+  float mean;
 } CMON_CONTROLLER_ITEM;
 
 typedef struct {
   CMON_CONTROLLER_TIME time;
-  CMON_CONTROLLER_ITEM temp_controller;
+  CMON_CONTROLLER_ITEM duty;
+  CMON_CONTROLLER_ITEM set_value;
 } CMON_CONTROLLER_DATA;
 
 /////////////////////////////////////////////////////////////////////////////

@@ -1,4 +1,28 @@
 ==================================================================
+26/2-2017 EMWHBR
+
+* R2A01
+
+* Adaptions to new hardware platform.
+
+* Updated hardware documentation (Kicad and LTSpice).
+
+* New separate test application for hardware watchdog timer.
+
+* CMON
+  - R2A01
+  - Added support for two external temperature sensors.
+  - Added support for hardware watchdog timer.
+  - Radiator is now controlled by SSR.
+  - PID control sample time changed from 600s to 60s.
+  - Fallback PWM period time changed from 600s to 60s.
+  - Changed default set temperature to 19.0 degC.
+  - Changed max allowed set temperature to 20.0 degC.
+  - Controller data now includes statistics for set value and duty.
+  - Improved error handling for faulty climate sensors.
+  - Updated system files.
+
+==================================================================
 20/1-2017 EMWHBR
 
 * R1A

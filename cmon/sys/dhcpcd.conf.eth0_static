@@ -40,9 +40,9 @@ slaac private
 # server, but it should not be run by default.
 nohook lookup-hostname
 
-##### DEBUG PROTOTYPE: BEGIN
+##### STATIC IP ETH0 - BEGIN
 interface eth0
 static ip_address=192.168.100.65/24
-static routers=192.168.100.17
-static domain_name_servers=192.168.100.17
-##### DEBUG PROTOTYPE: END
+#static routers=192.168.100.17
+#static domain_name_servers=192.168.100.17
+##### STATIC IP ETH0 - END

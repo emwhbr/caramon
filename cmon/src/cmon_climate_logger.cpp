@@ -240,9 +240,11 @@ void cmon_climate_logger::handle_climate_logger(void)
 
   climate_data.internal_temperature.valid = false;
   climate_data.internal_humidity.valid = false;
-  climate_data.external_temperature.valid = false;
+  climate_data.external_temperature_1.valid = false;
+  climate_data.external_temperature_2.valid = false;
 
-  controller_data.temp_controller.valid = false;
+  controller_data.duty.valid = false;
+  controller_data.set_value.valid = false;
 
   while (!is_stopped()) {
     // Wait for data from queues
@@ -252,7 +254,8 @@ void cmon_climate_logger::handle_climate_logger(void)
     }
     else {
       controller_data_received = false;
-      controller_data.temp_controller.valid = false;
+      controller_data.duty.valid = false;
+      controller_data.set_value.valid = false;
     }
 
     if (m_verbose && climate_data_received) {
@@ -395,15 +398,25 @@ void cmon_climate_logger::print_climate_data(const CMON_CLIMATE_DATA *data)
   else {
     cmon_io_put("%s : internal hum NOT valid\n", this->get_name().c_str());
   }
-  if (data->external_temperature.valid) {
-    cmon_io_put("%s : external temp, min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
+  if (data->external_temperature_1.valid) {
+    cmon_io_put("%s : external temp 1, min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
 		this->get_name().c_str(),
-		data->external_temperature.min,
-		data->external_temperature.max,
-		data->external_temperature.mean);
+		data->external_temperature_1.min,
+		data->external_temperature_1.max,
+		data->external_temperature_1.mean);
   }
   else {
-    cmon_io_put("%s : external temp NOT valid\n", this->get_name().c_str());
+    cmon_io_put("%s : external temp 1 NOT valid\n", this->get_name().c_str());
+  }
+  if (data->external_temperature_2.valid) {
+    cmon_io_put("%s : external temp 2, min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
+		this->get_name().c_str(),
+		data->external_temperature_2.min,
+		data->external_temperature_2.max,
+		data->external_temperature_2.mean);
+  }
+  else {
+    cmon_io_put("%s : external temp 2 NOT valid\n", this->get_name().c_str());
   }
 }
 
@@ -414,14 +427,25 @@ void cmon_climate_logger::print_controller_data(const CMON_CONTROLLER_DATA *data
   cmon_io_put("%s : ========== NEW CONTROLLER DATA ===========\n",
 	      this->get_name().c_str());
 
-  if (data->temp_controller.valid) {
-    cmon_io_put("%s : temp controller, duty=%-8.2f, set_value=%+-8.3f\n",
+  if (data->duty.valid) {
+    cmon_io_put("%s : duty, min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
 		this->get_name().c_str(),
-		data->temp_controller.duty,
-		data->temp_controller.set_value);
+		data->duty.min,
+		data->duty.max,
+		data->duty.mean);
   }
   else {
-    cmon_io_put("%s : temp controller NOT valid\n", this->get_name().c_str());
+    cmon_io_put("%s : duty NOT valid\n", this->get_name().c_str());
+  }
+  if (data->set_value.valid) {
+    cmon_io_put("%s : set value, min=%+-8.3f, max=%+-8.3f, mean=%+-8.3f\n",
+		this->get_name().c_str(),
+		data->set_value.min,
+		data->set_value.max,
+		data->set_value.mean);
+  }
+  else {
+    cmon_io_put("%s : set value NOT valid\n", this->get_name().c_str());
   }
 }
 

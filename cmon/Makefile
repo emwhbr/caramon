@@ -34,9 +34,11 @@ APP_OBJS = $(OBJ_DIR)/cmon_alive.o \
            $(OBJ_DIR)/cmon_main.o \
            $(OBJ_DIR)/cmon_power_switch.o \
            $(OBJ_DIR)/cmon_power_switch_rc.o \
+           $(OBJ_DIR)/cmon_power_switch_ssr.o \
            $(OBJ_DIR)/cmon_temp_controller.o \
            $(OBJ_DIR)/cmon_thread_utility.o \
            $(OBJ_DIR)/cmon_utility.o \
+           $(OBJ_DIR)/cmon_wdt.o \
            $(OBJ_DIR)/delay.o \
            $(OBJ_DIR)/ds18b20_io.o \
            $(OBJ_DIR)/gpio.o \

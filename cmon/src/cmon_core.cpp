@@ -15,6 +15,7 @@
 #include "cmon_thread_utility.h"
 #include "cmon_int_sensor.h"
 #include "cmon_ext_sensor.h"
+#include "cmon_wdt.h"
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definitions of macros
@@ -72,6 +73,13 @@ cmon_core::cmon_core(bool fallback,
     m_controller_data_queue =
       new cmon_controller_data_queue(CONTROLLER_DATA_QUEUE_INITIAL_NR_ELEMENTS);
   }
+
+  // Reset thread pointers
+  m_alive_auto.reset();
+  m_climate_sampler_auto.reset();
+  m_climate_logger_auto.reset();
+  m_temp_controller_auto.reset();
+  m_fallback_auto.reset();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -139,7 +147,23 @@ void cmon_core::setup_climate_control(void)
     cmon_io_put("About to initialize climate sensors\n");
   }
   cmon_int_sensor_initialize();
-  cmon_ext_sensor_initialize();
+  
+  // We can manage without the external climate sensors,
+  // and we don't want the watchdog to fire due to long timeouts here.
+  cmon_wdt_disable();
+  try {
+    cmon_ext_sensor_initialize(CMON_EXT_SENSOR_1);
+  }
+  catch (...) {
+    cmon_io_put("*** Warning: Failed to initialize external climate sensor 1\n");
+  }
+  try {
+    cmon_ext_sensor_initialize(CMON_EXT_SENSOR_2);
+  }
+  catch (...) {
+    cmon_io_put("*** Warning: Failed to initialize external climate sensor 2\n");
+  }
+  cmon_wdt_enable(); // Now we wan't the watchdog operational again
 
   //////////////////////////////////////////
   // Initialize alive thread
@@ -291,23 +315,24 @@ void cmon_core::cleanup_climate_control(void)
   }
 
   // Shutdown thread object
-  m_alive_auto->shutdown();
+  if (m_alive_auto.get()) {
+    m_alive_auto->shutdown();
 
-  // Take back ownership from auto_ptr
-  cmon_alive *alive = m_alive_auto.release();
-
-  try {
-    // Finalize thread object
-    cmon_thread_finalize((thread *)alive,
-			 ALIVE_THREAD_STOP_TIMEOUT);
-  }
-  catch (...) {
+    // Take back ownership from auto_ptr
+    cmon_alive *alive = m_alive_auto.release();
+    
+    try {
+      // Finalize thread object
+      cmon_thread_finalize((thread *)alive,
+			   ALIVE_THREAD_STOP_TIMEOUT);
+    }
+    catch (...) {
+      m_alive_auto = auto_ptr<cmon_alive>(alive);
+      throw;
+    }    
+    // Give back ownership to auto_ptr
     m_alive_auto = auto_ptr<cmon_alive>(alive);
-    throw;
   }
-  
-  // Give back ownership to auto_ptr
-  m_alive_auto = auto_ptr<cmon_alive>(alive);
 
   //////////////////////////////////////////
   // Finalize climate sampler thread
@@ -316,24 +341,25 @@ void cmon_core::cleanup_climate_control(void)
     cmon_io_put("About to finalize climate sampler thread\n");
   }
 
-  // Shutdown thread object
-  m_climate_sampler_auto->shutdown();
-
-  // Take back ownership from auto_ptr
-  cmon_climate_sampler *climate_sampler = m_climate_sampler_auto.release();
-
-  try {
-    // Finalize thread object
-    cmon_thread_finalize((thread *)climate_sampler,
-			 CLIMATE_SAMPLER_THREAD_STOP_TIMEOUT);
-  }
-  catch (...) {
+  if (m_climate_sampler_auto.get()) {
+    // Shutdown thread object
+    m_climate_sampler_auto->shutdown();
+    
+    // Take back ownership from auto_ptr
+    cmon_climate_sampler *climate_sampler = m_climate_sampler_auto.release();
+    
+    try {
+      // Finalize thread object
+      cmon_thread_finalize((thread *)climate_sampler,
+			   CLIMATE_SAMPLER_THREAD_STOP_TIMEOUT);
+    }
+    catch (...) {
+      m_climate_sampler_auto = auto_ptr<cmon_climate_sampler>(climate_sampler);
+      throw;
+    }  
+    // Give back ownership to auto_ptr
     m_climate_sampler_auto = auto_ptr<cmon_climate_sampler>(climate_sampler);
-    throw;
   }
-  
-  // Give back ownership to auto_ptr
-  m_climate_sampler_auto = auto_ptr<cmon_climate_sampler>(climate_sampler);
 
   //////////////////////////////////////////
   // Finalize climate logger thread
@@ -342,24 +368,25 @@ void cmon_core::cleanup_climate_control(void)
     cmon_io_put("About to finalize climate logger thread\n");
   }
 
-  // Shutdown thread object
-  m_climate_logger_auto->shutdown();
-
-  // Take back ownership from auto_ptr
-  cmon_climate_logger *climate_logger = m_climate_logger_auto.release();
-
-  try {
-    // Finalize thread object
-    cmon_thread_finalize((thread *)climate_logger,
-			 CLIMATE_LOGGER_THREAD_STOP_TIMEOUT);
-  }
-  catch (...) {
+  if (m_climate_logger_auto.get()) {
+    // Shutdown thread object
+    m_climate_logger_auto->shutdown();
+    
+    // Take back ownership from auto_ptr
+    cmon_climate_logger *climate_logger = m_climate_logger_auto.release();
+    
+    try {
+      // Finalize thread object
+      cmon_thread_finalize((thread *)climate_logger,
+			   CLIMATE_LOGGER_THREAD_STOP_TIMEOUT);
+    }
+    catch (...) {
+      m_climate_logger_auto = auto_ptr<cmon_climate_logger>(climate_logger);
+      throw;
+    }  
+    // Give back ownership to auto_ptr
     m_climate_logger_auto = auto_ptr<cmon_climate_logger>(climate_logger);
-    throw;
   }
-  
-  // Give back ownership to auto_ptr
-  m_climate_logger_auto = auto_ptr<cmon_climate_logger>(climate_logger);
 
   /////////////////////////////////////////////
   // Finalize temperature controller thread
@@ -369,24 +396,25 @@ void cmon_core::cleanup_climate_control(void)
       cmon_io_put("About to finalize temperature controller thread\n");
     }
     
-    // Shutdown thread object
-    m_temp_controller_auto->shutdown();
-    
-    // Take back ownership from auto_ptr
-    cmon_temp_controller *temp_controller = m_temp_controller_auto.release();
-    
-    try {
-      // Finalize thread object
-      cmon_thread_finalize((thread *)temp_controller,
-			   TEMP_CONTROLLER_THREAD_STOP_TIMEOUT);
-    }
-    catch (...) {
+    if (m_temp_controller_auto.get()) {
+      // Shutdown thread object
+      m_temp_controller_auto->shutdown();
+      
+      // Take back ownership from auto_ptr
+      cmon_temp_controller *temp_controller = m_temp_controller_auto.release();
+      
+      try {
+	// Finalize thread object
+	cmon_thread_finalize((thread *)temp_controller,
+			     TEMP_CONTROLLER_THREAD_STOP_TIMEOUT);
+      }
+      catch (...) {
+	m_temp_controller_auto = auto_ptr<cmon_temp_controller>(temp_controller);
+	throw;
+      }    
+      // Give back ownership to auto_ptr
       m_temp_controller_auto = auto_ptr<cmon_temp_controller>(temp_controller);
-      throw;
     }
-    
-    // Give back ownership to auto_ptr
-    m_temp_controller_auto = auto_ptr<cmon_temp_controller>(temp_controller);
   }
 
   //////////////////////////////////////////
@@ -396,7 +424,20 @@ void cmon_core::cleanup_climate_control(void)
     cmon_io_put("About to finalize climate sensors\n");
   }
   cmon_int_sensor_finalize();
-  cmon_ext_sensor_finalize();
+
+  // We can manage without external climate sensors
+  try {
+    cmon_ext_sensor_finalize(CMON_EXT_SENSOR_1);
+  }
+  catch (...) {
+    cmon_io_put("*** Warning: Failed to initialize external climate sensor 1");
+  }
+   try {
+    cmon_ext_sensor_finalize(CMON_EXT_SENSOR_2);
+  }
+  catch (...) {
+    cmon_io_put("*** Warning: Failed to initialize external climate sensor 2");
+  }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -465,8 +506,7 @@ void cmon_core::setup_fallback(void)
   catch (...) {
     m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
     throw;
-  }
-  
+  }  
   // Give back ownership to auto_ptr
   m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
 }
@@ -481,25 +521,26 @@ void cmon_core::cleanup_fallback(void)
   if (m_verbose) {
     cmon_io_put("About to finalize fallback thread\n");
   }
-
-  // Shutdown thread object
-  m_fallback_auto->shutdown();
-
-  // Take back ownership from auto_ptr
-  cmon_fallback *fallback = m_fallback_auto.release();
-
-  try {
-    // Finalize thread object
-    cmon_thread_finalize((thread *)fallback,
-			 FALLBACK_THREAD_STOP_TIMEOUT);
-  }
-  catch (...) {
-    m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
-    throw;
-  }
   
-  // Give back ownership to auto_ptr
-  m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+  if (m_fallback_auto.get()) {
+    // Shutdown thread object
+    m_fallback_auto->shutdown();
+    
+    // Take back ownership from auto_ptr
+    cmon_fallback *fallback = m_fallback_auto.release();
+    
+    try {
+      // Finalize thread object
+      cmon_thread_finalize((thread *)fallback,
+			   FALLBACK_THREAD_STOP_TIMEOUT);
+    }
+    catch (...) {
+      m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+      throw;
+    }    
+    // Give back ownership to auto_ptr
+    m_fallback_auto = auto_ptr<cmon_fallback>(fallback);
+  }
 }
 
 ////////////////////////////////////////////////////////////////

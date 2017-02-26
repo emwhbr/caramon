@@ -98,6 +98,7 @@ float cmon_int_sensor_get_temperature(void)
   }
   catch (...) {
     cmon_mutex_unlock(&m_hdc1008_mutex);
+    throw;
   }
   cmon_mutex_unlock(&m_hdc1008_mutex); // Lock-up sensor
   return value;
@@ -118,6 +119,7 @@ float cmon_int_sensor_get_humidity(void)
   }
   catch (...) {
     cmon_mutex_unlock(&m_hdc1008_mutex);
+    throw;
   }
   cmon_mutex_unlock(&m_hdc1008_mutex); // Lock-up sensor
   return value;

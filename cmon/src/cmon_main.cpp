@@ -23,10 +23,12 @@
 #include "cmon_file.h"
 #include "cmon_exception.h"
 #include "cmon_core.h"
+#include "cmon_led.h"
+#include "cmon_wdt.h"
 #include "delay.h"
 #include "signal_support.h"
 #include "gpio.h"
-#include "cmon_led.h"
+#include "shell_cmd.h"
 
 using namespace std;
 
@@ -47,6 +49,7 @@ static void app_report_switches(void);
 static bool cmon_ios_initialize(void);
 static bool cmon_gpio_initialize(void);
 static void cmon_gpio_finalize(void);
+static bool cmon_watchdog_kick(void);
 static void cmon_signal_handler(int sig);
 static bool cmon_initialize(void);
 static bool cmon_finalize(void);
@@ -74,6 +77,7 @@ static int g_disk_no_log = 0;
 static int g_net_no_log = 0;
 static int g_pid_ctrl = 0;
 static int g_verbose = 0;
+static int g_watchdog = 0;
 static string g_logfile = "";
 static string g_terminate_errorfile = "";
 
@@ -117,6 +121,7 @@ static bool app_parse_command_line(int argc, char *argv[])
     {"terminate-error", required_argument, 0, 't'},
     {"verbose",         no_argument,       0, 'v'},
     {"version",         no_argument,       0, 'V'},
+    {"watchdog",        no_argument,       0, 'w'},
     {0, 0, 0, 0}
   };
 
@@ -126,7 +131,7 @@ static bool app_parse_command_line(int argc, char *argv[])
   }
 
   while (1) {
-    c = getopt_long(argc, argv, "dfhl:npt:vV",
+    c = getopt_long(argc, argv, "dfhl:npt:vVw",
 		    long_options, &option_index);
     
     // Detect the end of the options
@@ -180,6 +185,10 @@ static bool app_parse_command_line(int argc, char *argv[])
       exit(EXIT_SUCCESS);
       break;
 
+    case 'w':
+      g_watchdog = 1;
+      break;
+
     default:
       command_line_ok = false;
       break;
@@ -225,7 +234,10 @@ static void app_report_help(const char *app_name)
 	  << "    Be verbose and print detailed information.\n\n"
     
 	  << "-V, --version\n"
-	  << "    Print product information and exit.\n";
+	  << "    Print product information and exit.\n\n"
+    
+	  << "-w, --watchdog\n"
+	  << "    Enable hardware watchdog timer.\n";
   
   printf(oss_msg.str().c_str());
 }
@@ -234,16 +246,19 @@ static void app_report_help(const char *app_name)
 
 static void app_report_prod_info(void)
 {
-  if (!g_fallback) {
-    cmon_io_put("CMON: %s-%s\n",
-		CMON_PRODUCT_NUMBER,
-		CMON_RSTATE);
+  try {
+    if (!g_fallback) {
+      cmon_io_put("CMON: %s-%s\n",
+		  CMON_PRODUCT_NUMBER,
+		  CMON_RSTATE);
+    }
+    else {
+      cmon_io_put("CMON(fallback): %s-%s\n",
+		  CMON_PRODUCT_NUMBER,
+		  CMON_RSTATE);
+    }
   }
-  else {
-    cmon_io_put("CMON(fallback): %s-%s\n",
-		CMON_PRODUCT_NUMBER,
-		CMON_RSTATE);
-  }
+  catch (...) {;}
 }
 
 ////////////////////////////////////////////////////////////////
@@ -257,18 +272,22 @@ static bool app_check_switches(void)
 
 static void app_report_switches(void)
 {
-  ostringstream oss_msg;
+  try {
+    ostringstream oss_msg;
 
-  oss_msg << "Command line switches:\n";
-  oss_msg << "\tfallback        : " << (g_fallback ? "on" : "off") << "\n";
-  oss_msg << "\tdisk-no-log     : " << (g_disk_no_log ? "on" : "off") << "\n";
-  oss_msg << "\tlogfile         : " << g_logfile << "\n";
-  oss_msg << "\tnet-no-log      : " << (g_net_no_log ? "on" : "off") << "\n";
-  oss_msg << "\tpid-ctrl        : " << (g_pid_ctrl ? "on" : "off") << "\n";
-  oss_msg << "\tterminate-error : " << g_terminate_errorfile << "\n";
-  oss_msg << "\tverbose         : " << (g_verbose ? "on" : "off");
+    oss_msg << "Command line switches:\n";
+    oss_msg << "\tfallback        : " << (g_fallback ? "on" : "off") << "\n";
+    oss_msg << "\tdisk-no-log     : " << (g_disk_no_log ? "on" : "off") << "\n";
+    oss_msg << "\tlogfile         : " << g_logfile << "\n";
+    oss_msg << "\tnet-no-log      : " << (g_net_no_log ? "on" : "off") << "\n";
+    oss_msg << "\tpid-ctrl        : " << (g_pid_ctrl ? "on" : "off") << "\n";
+    oss_msg << "\tterminate-error : " << g_terminate_errorfile << "\n";
+    oss_msg << "\tverbose         : " << (g_verbose ? "on" : "off") << "\n";
+    oss_msg << "\twatchdog        : " << (g_watchdog ? "on" : "off");
 
-  cmon_io_put("%s\n", oss_msg.str().c_str());
+    cmon_io_put("%s\n", oss_msg.str().c_str());
+  }
+  catch (...) {;}
 }
 
 ////////////////////////////////////////////////////////////////
@@ -304,6 +323,14 @@ static bool cmon_gpio_initialize(void)
       THROW_EXP(CMON_INTERNAL_ERROR, CMON_GPIO_ERROR,
 		"Initialize GPIO failed", NULL);
     }
+
+    // Initialize hardware watchdog
+    if (g_watchdog) {
+      cmon_wdt_initialize();
+      cmon_wdt_enable();  // The clock is ticking now ...
+    }
+
+    // Initialize LEDs
     cmon_led_initialize();
     cmon_led(CMON_LED_ALIVE,   false);   // Turn status LED off
     cmon_led(CMON_LED_SYSFAIL, false);   // Turn status LED off
@@ -331,6 +358,25 @@ static void cmon_gpio_finalize(void)
   }
   catch (...) {
     cmon_io_put("Finalize CMON GPIO, unexpected exception\n");
+  }
+}
+
+////////////////////////////////////////////////////////////////
+
+static bool cmon_watchdog_kick(void)
+{
+  try {
+    cmon_wdt_keep_alive();
+    return true;
+  }
+  catch (cmon_exception &gxp) {
+    cmon_io_put("Keep alive CMON WATCHDOG, exception:\n%s\n",
+		gxp.get_details().c_str());
+    return false;
+  }
+  catch (...) {
+    cmon_io_put("Keep alive CMON WATCHDOG, unexpected exception\n");
+    return false;
   }
 }
 
@@ -492,11 +538,32 @@ static void cmon_exit_on_error(void)
 {  
   delete g_cmon_core;
   try {
-    cmon_update_terminate_error_file(); // Log this occurrence of bad termination
-    cmon_led(CMON_LED_SYSFAIL, true);   // Turn status LED on
-    cmon_gpio_finalize();               // Finalize GPIO framework
+    if (g_watchdog) {
+
+      // We are using hardware watchdog timer and about to exit on an error.
+      // Now we need to stop kicking the dog so that a power cycle occurs.
+      // The best way to achieve this is to order a proper system shutdown.
+      // This is also the best way to prepare the system for a power cycle.
+
+      cmon_io_put("%s : terminated bad, about to shutdown system\n", CMON_NAME);
+
+      int exit_status;
+
+      shell_cmd sc;
+      const string SHUTDOWN_CMD = "shutdown -h now";
+      sc.execute(SHUTDOWN_CMD, exit_status);
+      for (;;) {
+	delay(1.0); // Wait for shutdown or power cycle (whichever happens first)
+      }
+    }
+    else {
+      // NO hardware watchdog timer
+      cmon_update_terminate_error_file(); // Log this occurrence of bad termination
+      cmon_led(CMON_LED_SYSFAIL, true);   // Turn status LED on
+      cmon_gpio_finalize();               // Finalize GPIO framework
+    }
   }
-  catch (...) {}
+ catch (...) {;}
 
   cmon_io_put("%s : terminated bad\n", CMON_NAME);
   exit(EXIT_FAILURE);
@@ -524,7 +591,9 @@ int main(int argc, char* argv[])
 
   // Initialize I/O singleton object
   if (!cmon_ios_initialize()) {
-    cmon_exit_on_error();
+    if (!g_watchdog) {        // When using hardware watchdog,
+      cmon_exit_on_error();   // we don't' want to quit here.
+    }                         // The watchdog isn't enabled yet.
   } 
 
   // Report product information
@@ -552,7 +621,11 @@ int main(int argc, char* argv[])
     if (g_received_sig_terminate) {
       cmon_io_put("%s : got signal to terminate\n", CMON_NAME);
       g_received_sig_terminate = 0;
-      if (!cmon_finalize()) {
+      if (g_watchdog) {
+	cmon_finalize();
+	cmon_exit_on_error();
+      }
+      else if (!cmon_finalize()) {
 	cmon_exit_on_error();
       }
       break;
@@ -563,6 +636,12 @@ int main(int argc, char* argv[])
       cmon_io_put("%s : status not OK, terminating\n", CMON_NAME);
       cmon_finalize();
       cmon_exit_on_error();
+    }
+    else if (g_watchdog) {
+      if (!cmon_watchdog_kick()) {
+	cmon_finalize();
+	cmon_exit_on_error();
+      }
     }
     
     // Take it easy

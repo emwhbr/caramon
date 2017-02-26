@@ -68,7 +68,7 @@ void cmon_log_disk::log_data(const CMON_CLIMATE_DATA *climate_data,
 {
   // NOTE!
   // Creates an entry in climate data file according to:
-  // <date&time>;<internal mean temp>;<internal mean hum>;<external mean temp>;<pid duty>;<pid set value>
+  // <date&time>;<internal mean temp>;<internal mean hum>;<external 1 mean temp>;<external 2 mean temp>;<pid duty>;<pid set value>
 
   // Decorate message with date and time (from climate data)
   ostringstream ossMsg;
@@ -91,24 +91,39 @@ void cmon_log_disk::log_data(const CMON_CLIMATE_DATA *climate_data,
     ossMsg << "not valid" << ";";
   }
 
-  // External climate
-  if (climate_data->external_temperature.valid) {
+  // External climate 1
+  if (climate_data->external_temperature_1.valid) {
     ossMsg << fixed << setw(8) << setprecision(3)
-	   << climate_data->external_temperature.mean << ";";
+	   << climate_data->external_temperature_1.mean << ";";
   }
   else {
     ossMsg << "not valid" << ";";
   }
 
-  // Controller PID
-  if (controller_data->temp_controller.valid) {
-    ossMsg << fixed << setw(8) << setprecision(2)
-	   << controller_data->temp_controller.duty << ";";
+  // External climate 2
+  if (climate_data->external_temperature_2.valid) {
     ossMsg << fixed << setw(8) << setprecision(3)
-	   << controller_data->temp_controller.set_value << ";";
+	   << climate_data->external_temperature_2.mean << ";";
   }
   else {
     ossMsg << "not valid" << ";";
+  }
+
+  // Controller PID - duty
+  if (controller_data->duty.valid) {
+    ossMsg << fixed << setw(8) << setprecision(2)
+	   << controller_data->duty.mean << ";";
+  }
+  else {
+    ossMsg << "not valid" << ";";
+  }
+
+  // Controller PID - set value
+  if (controller_data->set_value.valid) {
+    ossMsg << fixed << setw(8) << setprecision(3)
+	   << controller_data->set_value.mean << ";";
+  }
+  else {
     ossMsg << "not valid" << ";";
   }
 

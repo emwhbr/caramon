@@ -1,6 +1,6 @@
 // ************************************************************************
 // *                                                                      *
-// * Copyright (C) 2016 Bonden i Nol (hakanbrolin@hotmail.com)            *
+// * Copyright (C) 2017 Bonden i Nol (hakanbrolin@hotmail.com)            *
 // *                                                                      *
 // * This program is free software; you can redistribute it and/or modify *
 // * it under the terms of the GNU General Public License as published by *
@@ -9,8 +9,8 @@
 // *                                                                      *
 // ************************************************************************
 
-#ifndef __CMON_EXT_SENSOR_H__
-#define __CMON_EXT_SENSOR_H__
+#ifndef __CMON_WDT_H__
+#define __CMON_WDT_H__
 
 using namespace std;
 
@@ -21,22 +21,17 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of types
 /////////////////////////////////////////////////////////////////////////////
-// Available sensors
-typedef enum {
-  CMON_EXT_SENSOR_1,
-  CMON_EXT_SENSOR_2,
-  CMON_EXT_MAX_SENSORS
-} CMON_EXT_SENSOR;
-
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of exported functions
 /////////////////////////////////////////////////////////////////////////////
 
-extern void cmon_ext_sensor_initialize(CMON_EXT_SENSOR sensor);
+extern void cmon_wdt_initialize(void);
+extern void cmon_wdt_finalize(void);
 
-extern void cmon_ext_sensor_finalize(CMON_EXT_SENSOR sensor);
+extern void cmon_wdt_enable(void);
+extern void cmon_wdt_disable(void);
 
-extern float cmon_ext_sensor_get_temperature(CMON_EXT_SENSOR sensor);
+extern void cmon_wdt_keep_alive(void);
 
-#endif // __CMON_EXT_SENSOR_H__
+#endif // __CMON_WDT_H__

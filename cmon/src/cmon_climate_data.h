@@ -38,7 +38,8 @@ typedef struct {
   CMON_CLIMATE_TIME time;
   CMON_CLIMATE_ITEM internal_temperature;
   CMON_CLIMATE_ITEM internal_humidity;
-  CMON_CLIMATE_ITEM external_temperature;
+  CMON_CLIMATE_ITEM external_temperature_1;
+  CMON_CLIMATE_ITEM external_temperature_2;
 } CMON_CLIMATE_DATA;
 
 /////////////////////////////////////////////////////////////////////////////

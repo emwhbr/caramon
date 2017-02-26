@@ -19,8 +19,7 @@
 #include "cmon_utility.h"
 #include "cmon_io.h"
 #include "cmon_file.h"
-#include "cmon_power_switch_rc.h"
-#include "shell_cmd.h"
+#include "cmon_power_switch_ssr.h"
 #include "timer.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -32,18 +31,20 @@
 #define TEMP_PID_KD    0.00
 
 #define TEMP_PID_FILE_SET_VALUE      "/caramon/temp_pid_set_value"
-#define TEMP_PID_DEFAULT_SET_VALUE    9.0  // [deg C]
+#define TEMP_PID_DEFAULT_SET_VALUE   19.0  // [deg C]
 #define TEMP_PID_MIN_SET_VALUE        5.0  // [deg C]
-#define TEMP_PID_MAX_SET_VALUE       16.0  // [deg C]
+#define TEMP_PID_MAX_SET_VALUE       20.0  // [deg C]
 
-#define TEMP_PID_PERIOD_TIME_SEC   600.0  // [s]
-//#define TEMP_PID_PERIOD_TIME_SEC    20.0  // [s] JOE: For testing
+#define TEMP_PID_PERIOD_TIME_SEC       60.0   // [s]
+#define CONTROLLER_LOG_INTERVAL   (5 * 60.0)  // [s]
 
-#define CONTROLLER_LOG_INTERVAL  TEMP_PID_PERIOD_TIME_SEC
+#define MAX_CONSECUTIVE_INTERNAL_CLIMATE_SENSOR_ERRORS  2
 
-#define RADIATOR_MIN_CTRL_TIME  10.0  // [s] 
+#define RADIATOR_MIN_CTRL_TIME  10.0  // [s]
                                       // Minimum time for activation/deactivation
                                       // of wall outlet for radiator 
+
+#define PIN_RADIATOR_CTRL  GPIO_P1_15  // Controls radiator via SSR K1
 
 /////////////////////////////////////////////////////////////////////////////
 //               Public member functions
@@ -68,12 +69,18 @@ cmon_temp_controller(string thread_name,
   m_verbose = verbose;
   m_shutdown_requested = false;
 
-  m_radiator_switch = new cmon_power_switch_rc(string("RADIATOR-SWITCH"),
-					       CMON_TX433_SYSTEM_CODE,
-					       CMON_TX433_UNIT_CODE,
-					       m_verbose);
+  m_radiator_switch = new cmon_power_switch_ssr(string("RADIATOR-CTRL"),
+						PIN_RADIATOR_CTRL,
+						m_verbose);
 
   m_controller_data_queue = controller_data_queue;
+
+  m_controller.duty_stats.reset();
+  m_controller.set_value_stats.reset();
+
+  m_previous_temp = TEMP_PID_DEFAULT_SET_VALUE;
+  m_internal_climate_sensor_error_cnt = 0;
+  m_internal_climate_sensor_permanent_fault = false;
 
   m_temp_pid = new pid_ctrl(TEMP_PID_DEFAULT_SET_VALUE,
 			    TEMP_PID_KP,
@@ -227,6 +234,11 @@ void cmon_temp_controller::initialize_temp_controller(void)
   m_temp_pid->set_command_position(TEMP_PID_DEFAULT_SET_VALUE);
   this->check_temp_controller_set_value();
 
+  // Initialize power switch (Only necessary for SSR controlled power switch)
+  cmon_power_switch_ssr *ssr_switch = dynamic_cast<cmon_power_switch_ssr*>(m_radiator_switch);
+  if (ssr_switch) {
+    ssr_switch->initialize();
+  }
   this->radiator_off(); // Turn off radiator
 }
 
@@ -235,6 +247,12 @@ void cmon_temp_controller::initialize_temp_controller(void)
 void cmon_temp_controller::finalize_temp_controller(void)
 {
   this->radiator_off(); // Turn off radiator
+
+  // Finalize power switch (Only necessary for SSR controlled power switch)
+  cmon_power_switch_ssr *ssr_switch = dynamic_cast<cmon_power_switch_ssr*>(m_radiator_switch);
+  if (ssr_switch) {
+    ssr_switch->finalize();
+  }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -243,6 +261,7 @@ void cmon_temp_controller::handle_temp_controller(void)
 {
   long rc;
 
+  bool int_sensor_error;
   float temp;
   double radiator_duty;  
   double radiator_on_sec;
@@ -253,10 +272,28 @@ void cmon_temp_controller::handle_temp_controller(void)
   // Temperature PID controller loop
   controller_timer.reset();
   while (!is_stopped()) {
-    // Update PID
+
     this->check_temp_controller_set_value();
-    temp = cmon_int_sensor_get_temperature();
+
+    // There is no point continue when permanent
+    // fault in internal climate sensor is detected.
+    if (m_internal_climate_sensor_permanent_fault) {
+      THROW_EXP(CMON_INTERNAL_ERROR, CMON_INTERNAL_OPERATION_FAILED,
+		"Interal climate sensor permanent fault", NULL);
+    }
+    else {
+      this->sample_internal_temperature(temp, int_sensor_error);      
+      if (int_sensor_error) {
+	temp = m_previous_temp;  // Use last known good temperature
+      }
+      m_previous_temp = temp;
+    }
+
+    // Update PID
     radiator_duty = m_temp_pid->update((double)temp);
+
+    m_controller.duty_stats.insert((float)m_temp_pid->get_output());
+    m_controller.set_value_stats.insert((float)m_temp_pid->get_command_position());
 
     // Apply new output
     radiator_on_sec = TEMP_PID_PERIOD_TIME_SEC * radiator_duty / 100.0;
@@ -297,7 +334,11 @@ void cmon_temp_controller::handle_temp_controller(void)
 		    "Send controller data queue failed", NULL);
 	}
       }
-      controller_timer.reset();  // Prepare new log interval
+
+      // Prepare new log interval
+      controller_timer.reset();
+      m_controller.duty_stats.reset();
+      m_controller.set_value_stats.reset();
     }
   }
 }
@@ -328,6 +369,48 @@ void cmon_temp_controller::check_temp_controller_set_value(void)
     }
     cmon_delete_file(TEMP_PID_FILE_SET_VALUE); // Delete file to avoid
                                                // unnecessary access
+  }
+}
+
+////////////////////////////////////////////////////////////////
+
+void cmon_temp_controller::sample_internal_temperature(float &temperature,
+						       bool &sensor_error)
+{
+  string sensor_error_info;
+
+  sensor_error = false; // Assume no errors
+
+  // Sample internal climate by reading sensor.
+  // To many consecutive errors, and we will assume
+  // some kind of permanent fault.
+  try {
+    temperature = cmon_int_sensor_get_temperature();
+  }
+  catch (cmon_exception &cxp) {
+    sensor_error = true;
+    sensor_error_info = cxp.get_info();
+    if (++m_internal_climate_sensor_error_cnt >= MAX_CONSECUTIVE_INTERNAL_CLIMATE_SENSOR_ERRORS) {
+      m_internal_climate_sensor_permanent_fault = true;
+    }
+  }
+  catch (...) {
+    throw; // Zero tolerance for unexpected exceptions
+  }
+
+  // Handle sensor readings
+  if (sensor_error) {
+    cmon_io_put("%s : *** Warning: internal climate sensor, fault => %s\n",
+		this->get_name().c_str(),
+		sensor_error_info.c_str());
+  }
+  else {
+    m_internal_climate_sensor_error_cnt = 0; // Reset any previous errors
+    if (m_verbose) {
+      cmon_io_put("%s : internal climate, temp=%+-8.3f\n",
+		  this->get_name().c_str(),
+		  temperature);
+    }
   }
 }
 
@@ -430,7 +513,12 @@ void cmon_temp_controller::create_controller_data(cmon_controller_data *controll
   }
 
   // Controller data
-  controller_data->m_controller_data.temp_controller.valid = true;
-  controller_data->m_controller_data.temp_controller.duty = m_temp_pid->get_output();
-  controller_data->m_controller_data.temp_controller.set_value = m_temp_pid->get_command_position();
+  controller_data->m_controller_data.duty.valid = true;
+  controller_data->m_controller_data.duty.min = m_controller.duty_stats.get_min();
+  controller_data->m_controller_data.duty.max = m_controller.duty_stats.get_max();
+  controller_data->m_controller_data.duty.mean = m_controller.duty_stats.get_mean();
+  controller_data->m_controller_data.set_value.valid = true;
+  controller_data->m_controller_data.set_value.min = m_controller.set_value_stats.get_min();
+  controller_data->m_controller_data.set_value.max = m_controller.set_value_stats.get_max();
+  controller_data->m_controller_data.set_value.mean = m_controller.set_value_stats.get_mean();
 }

@@ -12,8 +12,6 @@
 #include <string.h>
 
 #include "cmon_climate_sampler.h"
-#include "cmon_int_sensor.h"
-#include "cmon_ext_sensor.h"
 #include "cmon_io.h"
 #include "cmon_exception.h"
 #include "cmon_utility.h"
@@ -23,9 +21,8 @@
 /////////////////////////////////////////////////////////////////////////////
 //               Definitions of macros
 /////////////////////////////////////////////////////////////////////////////
-#define CLIMATE_SAMPLE_INTERVAL   5.0  // [s]
+#define CLIMATE_SAMPLE_INTERVAL        5.0   // [s]
 #define CLIMATE_LOG_INTERVAL     (5 * 60.0)  // [s]
-//#define CLIMATE_LOG_INTERVAL     (10.0)  // [s] JOE: For testing
 
 #define MAX_CONSECUTIVE_INTERNAL_CLIMATE_SENSOR_ERRORS  8
 #define MAX_CONSECUTIVE_EXTERNAL_CLIMATE_SENSOR_ERRORS  8
@@ -55,14 +52,16 @@ cmon_climate_sampler(string thread_name,
 
   m_climate_data_queue = climate_data_queue;
 
-  m_internal_climate_sensor_error_cnt = 0;
-  m_internal_climate_sensor_permanent_fault = false;
-  m_internal_temperature_stats.reset();
-  m_internal_humidity_stats.reset();
+  m_internal_climate.sensor_error_cnt = 0;
+  m_internal_climate.sensor_permanent_fault = false;
+  m_internal_climate.temperature_stats.reset();
+  m_internal_climate.humidity_stats.reset();
 
-  m_external_climate_sensor_error_cnt = 0;
-  m_external_climate_sensor_permanent_fault = false;
-  m_external_temperature_stats.reset();
+  for (int i=0; i < CMON_EXT_MAX_SENSORS; i++) {
+    m_external_climate[i].sensor_error_cnt = 0;
+    m_external_climate[i].sensor_permanent_fault = false;
+    m_external_climate[i].temperature_stats.reset();
+  }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -243,7 +242,7 @@ void cmon_climate_sampler::handle_climate_sampler(void)
 
     // There is no point continue when permanent
     // fault in internal climate sensor is detected.
-    if (m_internal_climate_sensor_permanent_fault) {
+    if (m_internal_climate.sensor_permanent_fault) {
       THROW_EXP(CMON_INTERNAL_ERROR, CMON_INTERNAL_OPERATION_FAILED,
 		"Interal climate sensor permanent fault", NULL);
     }
@@ -252,17 +251,20 @@ void cmon_climate_sampler::handle_climate_sampler(void)
 				    int_humidity,
 				    int_sensor_error); // Sample internal climate
       if (!int_sensor_error) {
-	m_internal_temperature_stats.insert(int_temperature);
-	m_internal_humidity_stats.insert(int_humidity);
+	m_internal_climate.temperature_stats.insert(int_temperature);
+	m_internal_climate.humidity_stats.insert(int_humidity);
       }
     }
 
-    // We can manage without external climate sensor
-    if (!m_external_climate_sensor_permanent_fault) {
-      this->sample_external_climate(ext_temperature,
-				    ext_sensor_error); // Sample external climate
-      if (!ext_sensor_error) {
-	m_external_temperature_stats.insert(ext_temperature);
+    // We can manage without external climate sensors
+    for (int i=0; i < CMON_EXT_MAX_SENSORS; i++) {
+      if (!m_external_climate[i].sensor_permanent_fault) {
+	this->sample_external_climate((CMON_EXT_SENSOR )i,
+				      ext_temperature,
+				      ext_sensor_error); // Sample external climate
+	if (!ext_sensor_error) {
+	  m_external_climate[i].temperature_stats.insert(ext_temperature);
+	}
       }
     }
 
@@ -295,9 +297,11 @@ void cmon_climate_sampler::handle_climate_sampler(void)
 
       // Prepare new log interval
       climate_timer.reset();
-      m_internal_temperature_stats.reset();
-      m_internal_humidity_stats.reset();
-      m_external_temperature_stats.reset();
+      m_internal_climate.temperature_stats.reset();
+      m_internal_climate.humidity_stats.reset();
+      for (int i=0; i < CMON_EXT_MAX_SENSORS; i++) {
+	m_external_climate[i].temperature_stats.reset();
+      }
     }
 
     //////////////////////////////////
@@ -336,8 +340,8 @@ void cmon_climate_sampler::sample_internal_climate(float &temperature,
   catch (cmon_exception &cxp) {
     sensor_error = true;
     sensor_error_info = cxp.get_info();
-    if (++m_internal_climate_sensor_error_cnt >= MAX_CONSECUTIVE_INTERNAL_CLIMATE_SENSOR_ERRORS) {
-      m_internal_climate_sensor_permanent_fault = true;
+    if (++m_internal_climate.sensor_error_cnt >= MAX_CONSECUTIVE_INTERNAL_CLIMATE_SENSOR_ERRORS) {
+      m_internal_climate.sensor_permanent_fault = true;
     }
   }
   catch (...) {
@@ -346,12 +350,12 @@ void cmon_climate_sampler::sample_internal_climate(float &temperature,
 
   // Handle sensor readings
   if (sensor_error) {
-    cmon_io_put("%s : *** Warning: internal climate sensor fault => %s\n",
+    cmon_io_put("%s : *** Warning: internal climate sensor, fault => %s\n",
 		this->get_name().c_str(),
 		sensor_error_info.c_str());
   }
   else {
-    m_internal_climate_sensor_error_cnt = 0; // Reset any previous errors
+    m_internal_climate.sensor_error_cnt = 0; // Reset any previous errors
     if (m_verbose) {
       cmon_io_put("%s : internal climate, temp=%+-8.3f, hum=%-8.3f\n",
 		  this->get_name().c_str(),
@@ -363,7 +367,8 @@ void cmon_climate_sampler::sample_internal_climate(float &temperature,
 
 ////////////////////////////////////////////////////////////////
 
-void cmon_climate_sampler::sample_external_climate(float &temperature,
+void cmon_climate_sampler::sample_external_climate(CMON_EXT_SENSOR sensor,
+						   float &temperature,
 						   bool &sensor_error)
 {
   string sensor_error_info;
@@ -374,13 +379,13 @@ void cmon_climate_sampler::sample_external_climate(float &temperature,
   // To many consecutive errors, and we will assume
   // some kind of permanent fault.
   try {
-    temperature = cmon_ext_sensor_get_temperature();
+    temperature = cmon_ext_sensor_get_temperature(sensor);
   }
   catch (cmon_exception &cxp) {
     sensor_error = true;
     sensor_error_info = cxp.get_info();
-    if (++m_external_climate_sensor_error_cnt >= MAX_CONSECUTIVE_EXTERNAL_CLIMATE_SENSOR_ERRORS) {
-      m_external_climate_sensor_permanent_fault = true;
+    if (++m_external_climate[sensor].sensor_error_cnt >= MAX_CONSECUTIVE_EXTERNAL_CLIMATE_SENSOR_ERRORS) {
+      m_external_climate[sensor].sensor_permanent_fault = true;
     }
   }
   catch (...) {
@@ -389,15 +394,17 @@ void cmon_climate_sampler::sample_external_climate(float &temperature,
 
   // Handle sensor readings
   if (sensor_error) {
-    cmon_io_put("%s : *** Warning: external climate sensor fault => %s\n",
+    cmon_io_put("%s : *** Warning: external climate sensor %d, fault => %s\n",
 		this->get_name().c_str(),
+		sensor + 1,
 		sensor_error_info.c_str());
   }
   else {
-    m_external_climate_sensor_error_cnt = 0; // Reset any previous errors
+    m_external_climate[sensor].sensor_error_cnt = 0; // Reset any previous errors
     if (m_verbose) {
-      cmon_io_put("%s : external climate, temp=%+-8.3f\n",
+      cmon_io_put("%s : external climate, sensor %d, temp=%+-8.3f\n",
 		  this->get_name().c_str(),
+		  sensor + 1,
 		  temperature);
     }
   }
@@ -452,15 +459,15 @@ void cmon_climate_sampler::create_climate_data(cmon_climate_data *climate_data)
   }
 
   // Internal climate
-  if (!m_internal_climate_sensor_permanent_fault) {
+  if (!m_internal_climate.sensor_permanent_fault) {
     climate_data->m_climate_data.internal_temperature.valid = true;
-    climate_data->m_climate_data.internal_temperature.min = m_internal_temperature_stats.get_min();
-    climate_data->m_climate_data.internal_temperature.max = m_internal_temperature_stats.get_max();
-    climate_data->m_climate_data.internal_temperature.mean = m_internal_temperature_stats.get_mean();
+    climate_data->m_climate_data.internal_temperature.min = m_internal_climate.temperature_stats.get_min();
+    climate_data->m_climate_data.internal_temperature.max = m_internal_climate.temperature_stats.get_max();
+    climate_data->m_climate_data.internal_temperature.mean = m_internal_climate.temperature_stats.get_mean();
     climate_data->m_climate_data.internal_humidity.valid = true;
-    climate_data->m_climate_data.internal_humidity.min = m_internal_humidity_stats.get_min();
-    climate_data->m_climate_data.internal_humidity.max = m_internal_humidity_stats.get_max();
-    climate_data->m_climate_data.internal_humidity.mean = m_internal_humidity_stats.get_mean();
+    climate_data->m_climate_data.internal_humidity.min = m_internal_climate.humidity_stats.get_min();
+    climate_data->m_climate_data.internal_humidity.max = m_internal_climate.humidity_stats.get_max();
+    climate_data->m_climate_data.internal_humidity.mean = m_internal_climate.humidity_stats.get_mean();
     
   }
   else {
@@ -468,14 +475,31 @@ void cmon_climate_sampler::create_climate_data(cmon_climate_data *climate_data)
     climate_data->m_climate_data.internal_humidity.valid = false;
   }
   
-  // External climate
-  if (!m_external_climate_sensor_permanent_fault) {
-    climate_data->m_climate_data.external_temperature.valid = true;
-    climate_data->m_climate_data.external_temperature.min = m_external_temperature_stats.get_min();
-    climate_data->m_climate_data.external_temperature.max = m_external_temperature_stats.get_max();
-    climate_data->m_climate_data.external_temperature.mean = m_external_temperature_stats.get_mean();
+  // External climate, sensor 1
+  if (!m_external_climate[CMON_EXT_SENSOR_1].sensor_permanent_fault) {
+    climate_data->m_climate_data.external_temperature_1.valid = true;
+    climate_data->m_climate_data.external_temperature_1.min 
+      = m_external_climate[CMON_EXT_SENSOR_1].temperature_stats.get_min();
+    climate_data->m_climate_data.external_temperature_1.max =
+      m_external_climate[CMON_EXT_SENSOR_1].temperature_stats.get_max();
+    climate_data->m_climate_data.external_temperature_1.mean =
+      m_external_climate[CMON_EXT_SENSOR_1].temperature_stats.get_mean();
   }
   else {
-    climate_data->m_climate_data.external_temperature.valid = false;
+    climate_data->m_climate_data.external_temperature_1.valid = false;
+  }
+
+  // External climate, sensor 2
+  if (!m_external_climate[CMON_EXT_SENSOR_2].sensor_permanent_fault) {
+    climate_data->m_climate_data.external_temperature_2.valid = true;
+    climate_data->m_climate_data.external_temperature_2.min =
+      m_external_climate[CMON_EXT_SENSOR_2].temperature_stats.get_min();
+    climate_data->m_climate_data.external_temperature_2.max =
+      m_external_climate[CMON_EXT_SENSOR_2].temperature_stats.get_max();
+    climate_data->m_climate_data.external_temperature_2.mean =
+      m_external_climate[CMON_EXT_SENSOR_2].temperature_stats.get_mean();
+  }
+  else {
+    climate_data->m_climate_data.external_temperature_2.valid = false;
   }
 }

@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <string>
 
+#include "cmon_int_sensor.h"
+#include "cmon_ext_sensor.h"
 #include "cmon_climate_data_queue.h"
 #include "thread.h"
 #include "item_stats.h"
@@ -28,6 +30,18 @@ using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 //               Class support types
 /////////////////////////////////////////////////////////////////////////////
+typedef struct {
+  int               sensor_error_cnt;
+  bool              sensor_permanent_fault;
+  item_stats<float> temperature_stats;
+  item_stats<float> humidity_stats;
+} CMON_INTERNAL_CLIMATE;
+
+typedef struct {
+  int               sensor_error_cnt;
+  bool              sensor_permanent_fault;
+  item_stats<float> temperature_stats;
+} CMON_EXTERNAL_CLIMATE;
 
 /////////////////////////////////////////////////////////////////////////////
 //               Definition of classes
@@ -60,15 +74,10 @@ class cmon_climate_sampler : public thread {
   cmon_climate_data_queue *m_climate_data_queue;
 
   // Internal climate
-  int               m_internal_climate_sensor_error_cnt;
-  bool              m_internal_climate_sensor_permanent_fault;
-  item_stats<float> m_internal_temperature_stats;
-  item_stats<float> m_internal_humidity_stats;
+  CMON_INTERNAL_CLIMATE m_internal_climate;
 
   // External climate
-  int               m_external_climate_sensor_error_cnt;
-  bool              m_external_climate_sensor_permanent_fault;
-  item_stats<float> m_external_temperature_stats;
+  CMON_EXTERNAL_CLIMATE m_external_climate[CMON_EXT_MAX_SENSORS];
 
   void initialize_climate_sampler(void);
   void finalize_climate_sampler(void);
@@ -79,7 +88,8 @@ class cmon_climate_sampler : public thread {
 			       float &humidity,
 			       bool &sensor_error);
 
-  void sample_external_climate(float &temperature,
+  void sample_external_climate(CMON_EXT_SENSOR sensor,
+			       float &temperature,
 			       bool &sensor_error);
 
   void allocate_climate_data(cmon_climate_data **climate_data);
