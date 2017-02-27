@@ -25,10 +25,10 @@
 /////////////////////////////////////////////////////////////////////////////
 //               Definitions of macros
 /////////////////////////////////////////////////////////////////////////////
-// Temperature PID controller
-#define TEMP_PID_KP  163.64
-#define TEMP_PID_KI   28.05
-#define TEMP_PID_KD    0.00
+// Temperature PID controller (Ziegler-Nichols)
+#define TEMP_PID_KP  211.76
+#define TEMP_PID_KI   12.10
+#define TEMP_PID_KD  926.45
 
 #define TEMP_PID_FILE_SET_VALUE      "/caramon/temp_pid_set_value"
 #define TEMP_PID_DEFAULT_SET_VALUE   19.0  // [deg C]
