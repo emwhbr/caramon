@@ -22,7 +22,7 @@
 #define CURL_CMD          "/usr/bin/curl"
 #define CURL_CMD_EXIT_OK  0
 
-#define THINGSPEAK_URL            "https://api.thingspeak.com/update"
+#define THINGSPEAK_URL            "https://thingspeak.com/update"
 #define THINGSPEAK_WRITE_API_KEY  "G7DGBX4MO7JF89P1" // Channel 75139, caramonpi
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,6 +71,11 @@ void cmon_log_net::log_data(const CMON_CLIMATE_DATA *climate_data,
   // Sends data to Thingspeak channel using curl.
   // Channel is updated with the following command syntax:
   /*
+   * Primary method currently in use in code below:
+   * curl --fail --silent \
+   *      "https://thingspeak.com/update?key=<WRITE_KEY>&field1=<val>&field2=<val>&field3=<val>&field4=<val>&field5=<val>&field6=<val>"
+   *
+   * Alternative method not used anymore (somtimes resulting in channel not being updated):
    * curl --fail --silent \
    *      --data "key=<WRITE_KEY>&field1=<value1>&field2=<value2>&field3=<value3>&field4=<value4>&field5=<value5>&field6=<value6>" \
    *      https://api.thingspeak.com/update
@@ -78,8 +83,8 @@ void cmon_log_net::log_data(const CMON_CLIMATE_DATA *climate_data,
 
   ostringstream ossMsg;
 
-  string curl_cmd = string(CURL_CMD) + " --fail --silent --data";
-  curl_cmd += (" \"key=" + string(THINGSPEAK_WRITE_API_KEY));
+  string curl_cmd = string(CURL_CMD) + " --fail --silent";
+  curl_cmd += (" \"" + string(THINGSPEAK_URL) + "?key=" + string(THINGSPEAK_WRITE_API_KEY));
 
   // Internal temperature (Field 1)
   if (climate_data->internal_temperature.valid) {
@@ -123,8 +128,7 @@ void cmon_log_net::log_data(const CMON_CLIMATE_DATA *climate_data,
     curl_cmd += ("&field6=" + ossMsg.str());
   }
 
-  curl_cmd += "\" ";
-  curl_cmd += string(THINGSPEAK_URL);
+  curl_cmd += "\"";
 
   // Write data to Thingspeak channel
   this->execute_curl_cmd(curl_cmd);
