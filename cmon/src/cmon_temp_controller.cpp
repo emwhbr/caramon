@@ -31,7 +31,7 @@
 #define TEMP_PID_KD  926.45
 
 #define TEMP_PID_FILE_SET_VALUE      "/caramon/temp_pid_set_value"
-#define TEMP_PID_DEFAULT_SET_VALUE   19.0  // [deg C]
+#define TEMP_PID_DEFAULT_SET_VALUE    8.0  // [deg C]
 #define TEMP_PID_MIN_SET_VALUE        5.0  // [deg C]
 #define TEMP_PID_MAX_SET_VALUE       20.0  // [deg C]
 
